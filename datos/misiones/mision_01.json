@@ -26,7 +26,7 @@
 			"grupos": [
 				{
 					"tipo": "rapido",
-					"cantidad": 4,
+					"cantidad": 5,
 					"carril": "azar"
 				}
 			]
@@ -71,7 +71,7 @@
 				},
 				{
 					"tipo": "rapido",
-					"cantidad": 2,
+					"cantidad": 5,
 					"carril": "azar"
 				}
 			]
@@ -101,7 +101,7 @@
 				},
 				{
 					"tipo": "rapido",
-					"cantidad": 2,
+					"cantidad": 5,
 					"carril": "azar"
 				}
 			]

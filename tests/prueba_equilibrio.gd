@@ -6,16 +6,13 @@ extends Node
 ##
 ## Juega la misión con varias estrategias y comprueba:
 ## - Sin invocar nada se pierde.
-## - Solo con luchadores baratos se gana.
+## - Solo con luchadores baratos se gana, pero nunca con 3 estrellas
+##   (los rápidos se cuelan hasta la base y solo se frenan con daño a
+##   distancia).
 ## - Con una estrategia mixta (que usa explosivo y general) se gana.
-##
-## PENDIENTE: el plan pide además que solo con luchadores nunca se saquen 3
-## estrellas. Como las unidades cambian solas de carril para frenar a los
-## enemigos, la base suele salir intacta o caer entera. Se informa como aviso
-## mientras se ajustan las cifras.
 
 const ESCENA_BATALLA := preload("res://escenas/batalla/batalla.tscn")
-const SEMILLAS := [1, 2, 3]
+const SEMILLAS := [1, 2, 3, 4, 5]
 
 var _fallos: Array[String] = []
 var _avisos: Array[String] = []
@@ -79,7 +76,7 @@ func _comprobar(estrategia: int, semilla: int, r: Dictionary) -> void:
 			if not r.victoria:
 				_fallos.append("%s: solo con luchadores baratos se debería poder ganar" % nombre)
 			elif r.estrellas >= 3:
-				_avisos.append("%s: solo con luchadores baratos saca 3 estrellas (criterio pendiente)" % nombre)
+				_fallos.append("%s: solo con luchadores baratos no debería sacar 3 estrellas" % nombre)
 		JugadorAutomatico.Estrategia.MIXTO:
 			if not r.victoria:
 				_fallos.append("%s: la estrategia mixta debería ganar" % nombre)

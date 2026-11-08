@@ -1,10 +1,14 @@
 class_name Enemigo
 extends Combatiente
 ## Enemigo. Avanza hacia la base por su carril y ataca a la unidad más
-## cercana que detecte. Algunos tipos explotan al morir.
+## cercana que detecte. Algunos tipos explotan al morir y el rápido no se
+## detiene ante las unidades.
 
 var recurso_combate := 1.0
 var marca := "diagonal"
+## Si es true no se detiene ante las unidades: va directo a la base
+## (las unidades sí pueden atacarlo mientras pasa).
+var ignora_unidades := false
 
 
 func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
@@ -12,9 +16,12 @@ func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int
 	direccion = -1.0
 	recurso_combate = float(datos.get("recurso_combate", 1))
 	marca = datos.get("marca", "diagonal")
+	ignora_unidades = bool(datos.get("ignora_unidades", false))
 
 
 func elegir_objetivo() -> Node2D:
+	if ignora_unidades:
+		return batalla.base if batalla.base.esta_vivo() else null
 	var unidad := mas_cercano(batalla.unidades())
 	if unidad != null:
 		return unidad

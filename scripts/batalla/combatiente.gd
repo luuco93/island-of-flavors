@@ -99,7 +99,7 @@ func actuar(delta: float) -> void:
 		if carril_destino == carril and _espera_ataque <= 0.0:
 			atacar(objetivo)
 	else:
-		mover(delta)
+		mover(delta, objetivo.position.x)
 
 
 ## Se desplaza en vertical hacia el suelo del carril destino (si ya está
@@ -122,8 +122,13 @@ func elegir_objetivo() -> Node2D:
 	return null
 
 
-func mover(delta: float) -> void:
-	position.x += direccion * velocidad * delta
+## Avanza en su dirección o, si se indica, hacia la x de su objetivo
+## (por ejemplo, para perseguir a un enemigo que ya pasó).
+func mover(delta: float, hacia_x: float = NAN) -> void:
+	var sentido := direccion
+	if not is_nan(hacia_x) and not is_equal_approx(hacia_x, position.x):
+		sentido = signf(hacia_x - position.x)
+	position.x += sentido * velocidad * delta
 
 
 func atacar(blanco) -> void:

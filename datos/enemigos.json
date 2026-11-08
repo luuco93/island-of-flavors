@@ -1,5 +1,5 @@
 {
-	"_nota": "Propuesta para el prototipo. recurso_combate es lo que suma cada baja (1 a 5 según tipo). marca solo distingue la forma gris en pantalla.",
+	"_nota": "Propuesta para el prototipo. recurso_combate es lo que suma cada baja (1 a 5 según tipo). marca solo distingue la forma gris en pantalla. ignora_unidades: no se detiene ante las unidades y va directo a la base.",
 	"basico": {
 		"vida": 124,
 		"dano": 10.2,
@@ -16,8 +16,8 @@
 		"marca": "diagonal"
 	},
 	"rapido": {
-		"vida": 72,
-		"dano": 8.5,
+		"vida": 110,
+		"dano": 35,
 		"intervalo_ataque": 0.7,
 		"alcance": 20,
 		"rango_deteccion": 150,
@@ -28,7 +28,8 @@
 			40
 		],
 		"tono": 0.4,
-		"marca": "flecha"
+		"marca": "flecha",
+		"ignora_unidades": true
 	},
 	"tanque": {
 		"vida": 932,
