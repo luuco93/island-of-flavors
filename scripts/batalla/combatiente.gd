@@ -1,7 +1,8 @@
 class_name Combatiente
 extends Node2D
 ## Comportamiento común de unidades y enemigos: avanzar por el carril,
-## buscar el objetivo más cercano, atacarlo y morir.
+## buscar el objetivo más cercano (también en los carriles vecinos, y
+## cambiarse de carril para alcanzarlo), atacarlo y morir.
 
 signal murio(combatiente: Combatiente)
 
@@ -18,8 +19,11 @@ var intervalo_ataque := 1.0
 var alcance := 20.0
 var rango_deteccion := 150.0
 var velocidad := 0.0
-## Carril en el que está (0 arriba). Solo pelea con quien esté en su carril.
+## Carril en el que está (0 arriba). Solo ataca a quien esté en su carril;
+## para atacar a alguien de otro carril primero se cambia a ese carril.
 var carril := 0
+## Carril al que se está moviendo (igual a carril si no cambia).
+var carril_destino := 0
 ## +1 avanza hacia la derecha (unidades), -1 hacia la izquierda (enemigos).
 var direccion := 1.0
 var tamano := Vector2(26, 46)
@@ -31,11 +35,13 @@ var _espera_ataque := 0.0
 var _destello := 0.0
 var _destello_hasta := 0.0
 var _vivo := true
+var _desvio_y := 0.0
 
 
 func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
 	id = id_
 	carril = carril_
+	carril_destino = carril_
 	datos = datos_
 	batalla = batalla_
 	vida_maxima = float(datos.get("vida", 1))
@@ -79,12 +85,28 @@ func actuar(delta: float) -> void:
 	if objetivo == null:
 		mover(delta)
 		return
+	# Un objetivo en otro carril: primero hay que llegar a su carril.
+	if objetivo is Combatiente and objetivo.carril != carril:
+		carril_destino = objetivo.carril
+	if carril_destino != carril:
+		cambiar_carril(delta)
 	var distancia: float = objetivo.distancia_desde(position.x) - radio()
 	if distancia <= alcance:
-		if _espera_ataque <= 0.0:
+		if carril_destino == carril and _espera_ataque <= 0.0:
 			atacar(objetivo)
 	else:
 		mover(delta)
+
+
+## Se desplaza en vertical hacia el carril destino.
+func cambiar_carril(delta: float) -> void:
+	var y_destino: float = batalla.suelos[carril_destino] + _desvio_y
+	var paso := batalla.velocidad_cambio_carril * delta
+	if absf(y_destino - position.y) <= paso:
+		position.y = y_destino
+		carril = carril_destino
+	else:
+		position.y += signf(y_destino - position.y) * paso
 
 
 ## Las subclases devuelven a quién atacar (o hacia quién caminar).
@@ -119,15 +141,17 @@ func morir() -> void:
 	queue_free()
 
 
-## El combatiente vivo más cercano de una lista, en el mismo carril y dentro
-## del rango de detección.
+## El combatiente vivo más cercano de una lista dentro del rango de
+## detección. Cada carril de diferencia cuenta como una distancia extra, así
+## que prefiere a los de su carril pero ve a los de los carriles vecinos.
 func mas_cercano(candidatos: Array) -> Combatiente:
 	var mejor: Combatiente = null
 	var mejor_distancia := rango_deteccion
 	for c: Combatiente in candidatos:
-		if not c.esta_vivo() or c.carril != carril:
+		if not c.esta_vivo():
 			continue
-		var d := c.distancia_desde(position.x) - radio()
+		var d := c.distancia_desde(position.x) - radio() \
+			+ absi(c.carril_destino - carril) * batalla.coste_cambio_carril
 		if d <= mejor_distancia:
 			mejor = c
 			mejor_distancia = d

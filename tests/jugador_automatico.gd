@@ -14,14 +14,13 @@ func _physics_process(_delta: float) -> void:
 		return
 	match estrategia:
 		Estrategia.SOLO_LUCHADORES:
-			batalla.elegir_carril(_carril_mas_amenazado())
 			batalla.invocar("luchador_barato")
 		Estrategia.MIXTO:
 			_jugar_mixto()
 
 
-## Una estrategia razonable: refuerza el carril más amenazado con peso
-## pesado, francotirador y tiradores, apoyo si la base sufre, luchadores de
+## Una estrategia razonable: peso pesado, francotirador y tiradores
+## (las unidades eligen solas el carril), apoyo si la base sufre, luchadores de
 ## relleno, el explosivo sobre los grupos y el general cuando se puede.
 func _jugar_mixto() -> void:
 	if batalla.comandante_listo():
@@ -32,8 +31,7 @@ func _jugar_mixto() -> void:
 		var sobra := batalla.recurso_combate.actual >= batalla.poder.coste + batalla.comandante.coste
 		if objetivo.y >= 0 and (sobra or _cuenta_grupo >= 5):
 			batalla.soltar_poder(objetivo.x, int(objetivo.y))
-	var carril := _carril_mas_amenazado()
-	batalla.elegir_carril(carril)
+	var carril := batalla.carril_mas_amenazado()
 	# Urgencia: enemigos cerca de la base sin nadie que los frene.
 	if _urgente(carril):
 		for id: String in ["luchador_barato", "tirador", "peso_pesado"]:
@@ -47,24 +45,6 @@ func _jugar_mixto() -> void:
 		if batalla.preparacion_restante[id] <= 0.0:
 			batalla.invocar(id)  # Si no alcanza, espera a tenerlo.
 			return
-
-
-## El carril con más vida enemiga sin cubrir, pesando más a los que están
-## cerca de la base. Sin enemigos, el carril con menos unidades.
-func _carril_mas_amenazado() -> int:
-	var mejor := 0
-	var mejor_valor := -INF
-	for c in batalla.suelos.size():
-		var valor := 0.0
-		for e: Enemigo in batalla.enemigos_en(c):
-			var cercania := 1.0 + (1200.0 - e.position.x) / 600.0
-			valor += e.vida * cercania
-		for u: Unidad in batalla.unidades_en(c):
-			valor -= u.vida * 0.8
-		if valor > mejor_valor:
-			mejor = c
-			mejor_valor = valor
-	return mejor
 
 
 func _urgente(carril: int) -> bool:

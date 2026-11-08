@@ -10,8 +10,9 @@ extends Node
 ## - Con una estrategia mixta (que usa explosivo y general) se gana.
 ##
 ## PENDIENTE: el plan pide además que solo con luchadores nunca se saquen 3
-## estrellas. Con tres carriles ya hay partidas con 2 estrellas, pero no en
-## todas las semillas. Se informa como aviso mientras se ajustan las cifras.
+## estrellas. Como las unidades cambian solas de carril para frenar a los
+## enemigos, la base suele salir intacta o caer entera. Se informa como aviso
+## mientras se ajustan las cifras.
 
 const ESCENA_BATALLA := preload("res://escenas/batalla/batalla.tscn")
 const SEMILLAS := [1, 2, 3]

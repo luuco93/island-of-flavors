@@ -25,6 +25,5 @@
 	"enemigo.tanque": "Tanque",
 	"enemigo.armado": "Armado",
 	"enemigo.explosivo": "Explosivo",
-	"enemigo.horda": "Horda",
-	"carril.elegir": "Toca un carril para elegir dónde aparecen tus unidades"
+	"enemigo.horda": "Horda"
 }

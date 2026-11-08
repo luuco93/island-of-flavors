@@ -29,19 +29,20 @@
 		"explosivo"
 	],
 	"campo": {
-		"_nota": "Tres carriles horizontales. suelo_y es la altura del suelo de cada carril; la base y el obstáculo los cubren todos.",
+		"_nota": "Tres carriles horizontales. suelos_y es la altura del suelo de cada carril; la base y el obstáculo los cubren todos. Las unidades aparecen en el carril más amenazado y cambian de carril para perseguir objetivos: cada carril de diferencia cuenta como coste_cambio_carril píxeles más de distancia.",
 		"suelos_y": [
 			290,
 			410,
 			530
 		],
 		"alto_carril": 110,
-		"carril_inicial": 1,
 		"base_x": 80,
 		"obstaculo_x": 1200,
 		"aparicion_unidades_x": 150,
 		"aparicion_enemigos_x": 1140,
-		"dispersion_y": 6
+		"dispersion_y": 6,
+		"velocidad_cambio_carril": 60,
+		"coste_cambio_carril": 120
 	},
 	"comandante": "general"
 }

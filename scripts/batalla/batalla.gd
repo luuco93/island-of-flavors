@@ -2,11 +2,11 @@ class_name Batalla
 extends Node2D
 ## Una misión en tres carriles: base a la izquierda, obstáculo a la derecha,
 ## ambos cubren todos los carriles. Lleva el tiempo, los dos recursos, el
-## mazo, el carril elegido, el comandante y las condiciones de fin.
+## mazo, el comandante y las condiciones de fin. Las unidades eligen solas
+## su carril.
 
 signal unidad_invocada(unidad: Unidad)
 signal fase_cambiada(fase: Fase)
-signal carril_cambiado(carril: int)
 signal terminada_con(victoria: bool, estrellas: int)
 
 enum Fase { NORMAL, AVISO, HORDA }
@@ -43,8 +43,10 @@ var usos_comandante := 0
 ## Altura del suelo de cada carril (0 arriba).
 var suelos: Array[float] = []
 var alto_carril := 120.0
-## Carril donde aparecen las unidades que se invocan.
-var carril_elegido := 1
+## Velocidad vertical al cambiar de carril y distancia extra que cuenta
+## cada carril de diferencia al buscar objetivo.
+var velocidad_cambio_carril := 60.0
+var coste_cambio_carril := 120.0
 
 var _azar := RandomNumberGenerator.new()
 
@@ -56,7 +58,8 @@ func _ready() -> void:
 	for y in campo.suelos_y:
 		suelos.append(float(y))
 	alto_carril = float(campo.alto_carril)
-	carril_elegido = int(campo.carril_inicial)
+	velocidad_cambio_carril = float(campo.velocidad_cambio_carril)
+	coste_cambio_carril = float(campo.coste_cambio_carril)
 	var fondo := suelos[-1] + 10.0
 	var alto_total := fondo - (suelos[0] - alto_carril) + 20.0
 	base.position = Vector2(campo.base_x, fondo)
@@ -149,12 +152,25 @@ func puede_invocar(id: String) -> bool:
 		and recurso_despliegue.puede_pagar(coste_de(id)))
 
 
-func elegir_carril(carril: int) -> void:
-	carril = clampi(carril, 0, suelos.size() - 1)
-	if carril != carril_elegido:
-		carril_elegido = carril
-		carriles.queue_redraw()
-		carril_cambiado.emit(carril)
+## El carril donde más falta hace una unidad: más vida enemiga, pesando más
+## a los enemigos cerca de la base, menos la vida de las unidades que ya hay.
+func carril_mas_amenazado() -> int:
+	var mejor := suelos.size() / 2
+	var mejor_valor := -INF
+	for c in suelos.size():
+		var valor := 0.0
+		for e: Enemigo in enemigos():
+			if e.carril == c:
+				valor += e.vida * (1.0 + (obstaculo.position.x - e.position.x) / 600.0)
+		for u: Unidad in unidades():
+			if u.carril_destino == c:
+				valor -= u.vida * 0.8
+		# Sin diferencias, prefiere el carril central.
+		valor -= absi(c - suelos.size() / 2) * 0.01
+		if valor > mejor_valor:
+			mejor = c
+			mejor_valor = valor
+	return mejor
 
 
 ## El carril bajo una altura de pantalla, o -1 si no hay ninguno.
@@ -165,17 +181,19 @@ func carril_en(y: float) -> int:
 	return -1
 
 
-## Invoca en el carril indicado, o en el elegido si no se indica.
+## Invoca una unidad. Elige sola el carril más amenazado, salvo que se
+## indique uno.
 func invocar(id: String, carril: int = -1) -> Unidad:
 	if not puede_invocar(id):
 		return null
 	if carril < 0:
-		carril = carril_elegido
+		carril = carril_mas_amenazado()
 	recurso_despliegue.pagar(coste_de(id))
 	preparacion_restante[id] = preparacion_de(id)
 	var unidad := Unidad.new()
 	unidad.configurar(id, Datos.unidad(id), self, carril)
-	unidad.position = Vector2(reglas.campo.aparicion_unidades_x, suelos[carril] + _desvio_y())
+	unidad._desvio_y = _desvio_y()
+	unidad.position = Vector2(reglas.campo.aparicion_unidades_x, suelos[carril] + unidad._desvio_y)
 	capa_unidades.add_child(unidad)
 	unidades_invocadas += 1
 	unidad_invocada.emit(unidad)
@@ -187,7 +205,8 @@ func invocar(id: String, carril: int = -1) -> Unidad:
 func _aparecer_enemigo(tipo: String, carril: int, desfase: float) -> void:
 	var enemigo := Enemigo.new()
 	enemigo.configurar(tipo, Datos.enemigo(tipo), self, carril)
-	enemigo.position = Vector2(punto_aparicion.position.x + desfase, suelos[carril] + _desvio_y())
+	enemigo._desvio_y = _desvio_y()
+	enemigo.position = Vector2(punto_aparicion.position.x + desfase, suelos[carril] + enemigo._desvio_y)
 	enemigo.murio.connect(_on_enemigo_murio)
 	capa_enemigos.add_child(enemigo)
 
@@ -252,15 +271,6 @@ func unidades_en(carril: int) -> Array:
 
 func enemigos_en(carril: int) -> Array:
 	return enemigos().filter(func(e: Enemigo) -> bool: return e.carril == carril)
-
-
-func _unhandled_input(evento: InputEvent) -> void:
-	# Tocar un carril lo elige para las próximas invocaciones.
-	if evento is InputEventMouseButton and evento.pressed and evento.button_index == MOUSE_BUTTON_LEFT:
-		var punto: Vector2 = get_canvas_transform().affine_inverse() * evento.position
-		var c := carril_en(punto.y)
-		if c >= 0:
-			elegir_carril(c)
 
 
 func _desvio_y() -> float:

@@ -174,8 +174,6 @@ func _process(_delta: float) -> void:
 			_aviso.text = ""
 	if _apuntando:
 		_aviso.text = Textos.t("poder.apuntar", {"nombre": Textos.t("poder." + batalla.poder.id).to_lower()})
-	elif batalla.tiempo < 6.0 and _aviso.text.is_empty():
-		_aviso.text = Textos.t("carril.elegir")
 	_boton_comandante.disabled = not batalla.comandante_listo()
 
 	var poder := batalla.poder

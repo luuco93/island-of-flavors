@@ -2,7 +2,7 @@
 	"_nota": "Primera misión de prueba. Las oleadas salen en orden; cada una espera 'espera' segundos tras la anterior. Al acabar la lista se repite desde 'repetir_desde' sumando 'aumento_por_repeticion' a cada grupo. carril: un número (0 arriba, 2 abajo), 'azar' o 'todos'. Pasado el límite de tiempo llega la horda.",
 	"oleadas": [
 		{
-			"espera": 4,
+			"espera": 4.6,
 			"grupos": [
 				{
 					"tipo": "basico",
@@ -12,7 +12,7 @@
 			]
 		},
 		{
-			"espera": 12,
+			"espera": 13.8,
 			"grupos": [
 				{
 					"tipo": "basico",
@@ -22,7 +22,7 @@
 			]
 		},
 		{
-			"espera": 12,
+			"espera": 13.8,
 			"grupos": [
 				{
 					"tipo": "rapido",
@@ -32,7 +32,7 @@
 			]
 		},
 		{
-			"espera": 14,
+			"espera": 16.1,
 			"grupos": [
 				{
 					"tipo": "basico",
@@ -47,7 +47,7 @@
 			]
 		},
 		{
-			"espera": 14,
+			"espera": 16.1,
 			"grupos": [
 				{
 					"tipo": "tanque",
@@ -62,7 +62,7 @@
 			]
 		},
 		{
-			"espera": 14,
+			"espera": 16.1,
 			"grupos": [
 				{
 					"tipo": "explosivo",
@@ -77,7 +77,7 @@
 			]
 		},
 		{
-			"espera": 14,
+			"espera": 16.1,
 			"grupos": [
 				{
 					"tipo": "basico",
@@ -87,7 +87,7 @@
 			]
 		},
 		{
-			"espera": 14,
+			"espera": 16.1,
 			"grupos": [
 				{
 					"tipo": "armado",

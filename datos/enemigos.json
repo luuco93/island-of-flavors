@@ -1,8 +1,8 @@
 {
 	"_nota": "Propuesta para el prototipo. recurso_combate es lo que suma cada baja (1 a 5 según tipo). marca solo distingue la forma gris en pantalla.",
 	"basico": {
-		"vida": 138,
-		"dano": 12,
+		"vida": 124,
+		"dano": 10.2,
 		"intervalo_ataque": 1.0,
 		"alcance": 20,
 		"rango_deteccion": 150,
@@ -16,8 +16,8 @@
 		"marca": "diagonal"
 	},
 	"rapido": {
-		"vida": 80,
-		"dano": 10,
+		"vida": 72,
+		"dano": 8.5,
 		"intervalo_ataque": 0.7,
 		"alcance": 20,
 		"rango_deteccion": 150,
@@ -31,8 +31,8 @@
 		"marca": "flecha"
 	},
 	"tanque": {
-		"vida": 1035,
-		"dano": 35,
+		"vida": 932,
+		"dano": 29.8,
 		"intervalo_ataque": 1.6,
 		"alcance": 25,
 		"rango_deteccion": 150,
@@ -46,8 +46,8 @@
 		"marca": "diagonal"
 	},
 	"armado": {
-		"vida": 103,
-		"dano": 10,
+		"vida": 93,
+		"dano": 8.5,
 		"intervalo_ataque": 1.0,
 		"alcance": 180,
 		"rango_deteccion": 220,
@@ -61,8 +61,8 @@
 		"marca": "mira"
 	},
 	"explosivo": {
-		"vida": 184,
-		"dano": 10,
+		"vida": 166,
+		"dano": 8.5,
 		"intervalo_ataque": 1.2,
 		"alcance": 20,
 		"rango_deteccion": 150,
@@ -80,8 +80,8 @@
 		}
 	},
 	"horda": {
-		"vida": 299,
-		"dano": 20,
+		"vida": 269,
+		"dano": 17.0,
 		"intervalo_ataque": 1.0,
 		"alcance": 20,
 		"rango_deteccion": 150,
