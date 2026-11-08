@@ -6,7 +6,7 @@ Estado actual: **prototipo gris** (Fase 1 del plan). Formas grises, sin arte ni 
 
 ## Cómo abrirlo
 
-1. Instala [Godot 4.3](https://godotengine.org/download) o superior (versión estándar, no .NET).
+1. Instala [Godot 4.4](https://godotengine.org/download) o superior (versión estándar, no .NET).
 2. En Godot, *Importar* y elige `project.godot`.
 3. Pulsa *Ejecutar* (F5). La escena principal es `escenas/batalla/batalla.tscn`.
 
