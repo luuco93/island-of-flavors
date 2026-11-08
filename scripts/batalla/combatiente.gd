@@ -83,13 +83,17 @@ func _physics_process(delta: float) -> void:
 func actuar(delta: float) -> void:
 	objetivo = elegir_objetivo()
 	if objetivo == null:
+		carril_destino = carril
+		cambiar_carril(delta)
 		mover(delta)
 		return
-	# Un objetivo en otro carril: primero hay que llegar a su carril.
-	if objetivo is Combatiente and objetivo.carril != carril:
+	# El carril destino es siempre el del objetivo actual. Si el objetivo es
+	# la base o el obstáculo (cubren todos los carriles), sigue en el suyo.
+	if objetivo is Combatiente:
 		carril_destino = objetivo.carril
-	if carril_destino != carril:
-		cambiar_carril(delta)
+	else:
+		carril_destino = carril
+	cambiar_carril(delta)
 	var distancia: float = objetivo.distancia_desde(position.x) - radio()
 	if distancia <= alcance:
 		if carril_destino == carril and _espera_ataque <= 0.0:
@@ -98,9 +102,13 @@ func actuar(delta: float) -> void:
 		mover(delta)
 
 
-## Se desplaza en vertical hacia el carril destino.
+## Se desplaza en vertical hacia el suelo del carril destino (si ya está
+## allí no hace nada). Cambia de carril al llegar.
 func cambiar_carril(delta: float) -> void:
 	var y_destino: float = batalla.suelos[carril_destino] + _desvio_y
+	if is_equal_approx(position.y, y_destino):
+		carril = carril_destino
+		return
 	var paso := batalla.velocidad_cambio_carril * delta
 	if absf(y_destino - position.y) <= paso:
 		position.y = y_destino
@@ -142,8 +150,9 @@ func morir() -> void:
 
 
 ## El combatiente vivo más cercano de una lista dentro del rango de
-## detección. Cada carril de diferencia cuenta como una distancia extra, así
-## que prefiere a los de su carril pero ve a los de los carriles vecinos.
+## detección. Cada carril de diferencia (contado desde el carril al que va)
+## cuenta como una distancia extra: prefiere a los de su carril, ve a los de
+## los vecinos y no cambia de idea a mitad de camino.
 func mas_cercano(candidatos: Array) -> Combatiente:
 	var mejor: Combatiente = null
 	var mejor_distancia := rango_deteccion
@@ -151,7 +160,7 @@ func mas_cercano(candidatos: Array) -> Combatiente:
 		if not c.esta_vivo():
 			continue
 		var d := c.distancia_desde(position.x) - radio() \
-			+ absi(c.carril_destino - carril) * batalla.coste_cambio_carril
+			+ absi(c.carril - carril_destino) * batalla.coste_cambio_carril
 		if d <= mejor_distancia:
 			mejor = c
 			mejor_distancia = d
