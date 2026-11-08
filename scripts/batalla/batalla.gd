@@ -1,16 +1,18 @@
 class_name Batalla
 extends Node2D
-## Una misión en un carril: base a la izquierda, obstáculo a la derecha.
-## Lleva el tiempo, los dos recursos, el mazo y las condiciones de fin.
+## Una misión en tres carriles: base a la izquierda, obstáculo a la derecha,
+## ambos cubren todos los carriles. Lleva el tiempo, los dos recursos, el
+## mazo, el carril elegido, el comandante y las condiciones de fin.
 
 signal unidad_invocada(unidad: Unidad)
 signal fase_cambiada(fase: Fase)
+signal carril_cambiado(carril: int)
 signal terminada_con(victoria: bool, estrellas: int)
 
 enum Fase { NORMAL, AVISO, HORDA }
 
 @export var mision_id := "mision_01"
-## Semilla del azar (solo afecta a la posición vertical de cada combatiente).
+## Semilla del azar (carril de las oleadas y posición vertical).
 @export var semilla := 1
 
 @onready var base: Base = $Base
@@ -23,6 +25,8 @@ enum Fase { NORMAL, AVISO, HORDA }
 @onready var recurso_combate: RecursoCombate = $RecursoCombate
 @onready var generador: GeneradorEnemigos = $GeneradorEnemigos
 @onready var poder: PoderCombate = $PoderCombate
+@onready var comandante: Comandante = $Comandante
+@onready var carriles: Carriles = $Carriles
 
 var reglas: Dictionary = {}
 var mazo: Array[String] = []
@@ -35,6 +39,12 @@ var victoria := false
 var estrellas := 0
 var unidades_invocadas := 0
 var bajas_enemigas := 0
+var usos_comandante := 0
+## Altura del suelo de cada carril (0 arriba).
+var suelos: Array[float] = []
+var alto_carril := 120.0
+## Carril donde aparecen las unidades que se invocan.
+var carril_elegido := 1
 
 var _azar := RandomNumberGenerator.new()
 
@@ -42,11 +52,23 @@ var _azar := RandomNumberGenerator.new()
 func _ready() -> void:
 	_azar.seed = semilla
 	reglas = Datos.reglas
-	var carril: Dictionary = reglas.carril
-	var suelo := float(carril.suelo_y)
-	base.position = Vector2(carril.base_x, suelo)
-	obstaculo.position = Vector2(carril.obstaculo_x, suelo)
-	punto_aparicion.position = Vector2(carril.aparicion_enemigos_x, suelo)
+	var campo: Dictionary = reglas.campo
+	for y in campo.suelos_y:
+		suelos.append(float(y))
+	alto_carril = float(campo.alto_carril)
+	carril_elegido = int(campo.carril_inicial)
+	var fondo := suelos[-1] + 10.0
+	var alto_total := fondo - (suelos[0] - alto_carril) + 20.0
+	base.position = Vector2(campo.base_x, fondo)
+	base.alto = alto_total
+	obstaculo.position = Vector2(campo.obstaculo_x, fondo)
+	obstaculo.alto = alto_total
+	punto_aparicion.position = Vector2(campo.aparicion_enemigos_x, 0)
+	comandante.position = Vector2(campo.base_x, fondo - alto_total)
+	var id_comandante: String = reglas.comandante
+	comandante.configurar(id_comandante, Datos.comandante(id_comandante))
+	carriles.batalla = self
+	carriles.queue_redraw()
 
 	base.configurar(reglas.vida_base)
 	obstaculo.configurar(reglas.vida_obstaculo)
@@ -67,7 +89,7 @@ func _ready() -> void:
 	var id_poder: String = reglas.poderes_iniciales[0]
 	poder.configurar(id_poder, Datos.poder(id_poder))
 
-	generador.configurar(Datos.mision(mision_id), inicio_horda())
+	generador.configurar(Datos.mision(mision_id), inicio_horda(), suelos.size(), _azar)
 	generador.pidio_enemigo.connect(_aparecer_enemigo)
 
 
@@ -127,15 +149,33 @@ func puede_invocar(id: String) -> bool:
 		and recurso_despliegue.puede_pagar(coste_de(id)))
 
 
-func invocar(id: String) -> Unidad:
+func elegir_carril(carril: int) -> void:
+	carril = clampi(carril, 0, suelos.size() - 1)
+	if carril != carril_elegido:
+		carril_elegido = carril
+		carriles.queue_redraw()
+		carril_cambiado.emit(carril)
+
+
+## El carril bajo una altura de pantalla, o -1 si no hay ninguno.
+func carril_en(y: float) -> int:
+	for i in suelos.size():
+		if y <= suelos[i] + 20.0 and y >= suelos[i] - alto_carril + 20.0:
+			return i
+	return -1
+
+
+## Invoca en el carril indicado, o en el elegido si no se indica.
+func invocar(id: String, carril: int = -1) -> Unidad:
 	if not puede_invocar(id):
 		return null
+	if carril < 0:
+		carril = carril_elegido
 	recurso_despliegue.pagar(coste_de(id))
 	preparacion_restante[id] = preparacion_de(id)
 	var unidad := Unidad.new()
-	unidad.configurar(id, Datos.unidad(id), self)
-	var carril: Dictionary = reglas.carril
-	unidad.position = Vector2(carril.aparicion_unidades_x, float(carril.suelo_y) + _desvio_y())
+	unidad.configurar(id, Datos.unidad(id), self, carril)
+	unidad.position = Vector2(reglas.campo.aparicion_unidades_x, suelos[carril] + _desvio_y())
 	capa_unidades.add_child(unidad)
 	unidades_invocadas += 1
 	unidad_invocada.emit(unidad)
@@ -144,10 +184,10 @@ func invocar(id: String) -> Unidad:
 
 # --- Enemigos y poderes -----------------------------------------------------
 
-func _aparecer_enemigo(tipo: String, desfase: float) -> void:
+func _aparecer_enemigo(tipo: String, carril: int, desfase: float) -> void:
 	var enemigo := Enemigo.new()
-	enemigo.configurar(tipo, Datos.enemigo(tipo), self)
-	enemigo.position = punto_aparicion.position + Vector2(desfase, _desvio_y())
+	enemigo.configurar(tipo, Datos.enemigo(tipo), self, carril)
+	enemigo.position = Vector2(punto_aparicion.position.x + desfase, suelos[carril] + _desvio_y())
 	enemigo.murio.connect(_on_enemigo_murio)
 	capa_enemigos.add_child(enemigo)
 
@@ -157,17 +197,45 @@ func _on_enemigo_murio(enemigo: Combatiente) -> void:
 	recurso_combate.sumar((enemigo as Enemigo).recurso_combate)
 
 
-func soltar_poder(x: float) -> bool:
-	if terminada:
+## Suelta el poder de combate en un punto de un carril.
+func soltar_poder(x: float, carril: int) -> bool:
+	if terminada or carril < 0:
 		return false
-	var alcanzados := poder.soltar(x, recurso_combate, enemigos())
+	var alcanzados := poder.soltar(x, recurso_combate, enemigos_en(carril))
 	if alcanzados < 0:
 		return false
-	var efecto := EfectoArea.new()
-	efecto.radio = poder.radio
-	efecto.position = Vector2(x, float(reglas.carril.suelo_y) - 20.0)
-	capa_efectos.add_child(efecto)
+	_efecto_area(x, carril, poder.radio)
 	return true
+
+
+func comandante_listo() -> bool:
+	return not terminada and comandante.listo(recurso_combate)
+
+
+## Habilidad activa del comandante.
+func usar_comandante() -> bool:
+	if terminada:
+		return false
+	var limite := obstaculo.position.x - obstaculo.ancho / 2.0
+	if comandante.usar(recurso_combate, enemigos(), limite) < 0:
+		return false
+	usos_comandante += 1
+	return true
+
+
+## Un enemigo que explota al morir daña a las unidades cercanas de su carril.
+func explosion_enemiga(x: float, carril: int, dano: float, radio: float) -> void:
+	for u: Unidad in unidades_en(carril):
+		if u.esta_vivo() and absf(u.position.x - x) <= radio:
+			u.recibir_dano(dano)
+	_efecto_area(x, carril, radio)
+
+
+func _efecto_area(x: float, carril: int, radio: float) -> void:
+	var efecto := EfectoArea.new()
+	efecto.radio = radio
+	efecto.position = Vector2(x, suelos[carril] - 20.0)
+	capa_efectos.add_child(efecto)
 
 
 func unidades() -> Array:
@@ -178,8 +246,25 @@ func enemigos() -> Array:
 	return capa_enemigos.get_children()
 
 
+func unidades_en(carril: int) -> Array:
+	return unidades().filter(func(u: Unidad) -> bool: return u.carril == carril)
+
+
+func enemigos_en(carril: int) -> Array:
+	return enemigos().filter(func(e: Enemigo) -> bool: return e.carril == carril)
+
+
+func _unhandled_input(evento: InputEvent) -> void:
+	# Tocar un carril lo elige para las próximas invocaciones.
+	if evento is InputEventMouseButton and evento.pressed and evento.button_index == MOUSE_BUTTON_LEFT:
+		var punto: Vector2 = get_canvas_transform().affine_inverse() * evento.position
+		var c := carril_en(punto.y)
+		if c >= 0:
+			elegir_carril(c)
+
+
 func _desvio_y() -> float:
-	var d := float(reglas.carril.dispersion_y)
+	var d := float(reglas.campo.dispersion_y)
 	return _azar.randf_range(-d, d)
 
 

@@ -11,11 +11,20 @@
 	"unidad.apoyo": "Apoyo",
 	"poder.explosivo": "Explosivo",
 	"mazo.vacio": "—",
-	"poder.apuntar": "Toca el carril para soltar el {nombre}",
+	"poder.apuntar": "Toca el carril donde soltar el {nombre}",
 	"aviso.horda": "¡Se acerca la horda! {segundos}",
 	"aviso.horda_llego": "¡Horda!",
 	"fin.victoria": "Victoria",
 	"fin.derrota": "Derrota",
 	"fin.vida_base": "Vida de la base: {porcentaje} %",
-	"fin.reintentar": "Reintentar"
+	"fin.reintentar": "Reintentar",
+	"comandante.general": "General",
+	"habilidad.andanada": "Andanada",
+	"enemigo.basico": "Básico",
+	"enemigo.rapido": "Rápido",
+	"enemigo.tanque": "Tanque",
+	"enemigo.armado": "Armado",
+	"enemigo.explosivo": "Explosivo",
+	"enemigo.horda": "Horda",
+	"carril.elegir": "Toca un carril para elegir dónde aparecen tus unidades"
 }

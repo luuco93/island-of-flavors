@@ -10,6 +10,7 @@ var reglas: Dictionary = {}
 var unidades: Dictionary = {}
 var enemigos: Dictionary = {}
 var poderes: Dictionary = {}
+var comandantes: Dictionary = {}
 
 
 func _init() -> void:
@@ -21,6 +22,7 @@ func cargar() -> void:
 	unidades = LectorJson.leer(RUTA + "unidades.json")
 	enemigos = LectorJson.leer(RUTA + "enemigos.json")
 	poderes = LectorJson.leer(RUTA + "poderes.json")
+	comandantes = LectorJson.leer(RUTA + "comandante.json")
 
 
 func mision(id: String) -> Dictionary:
@@ -41,3 +43,8 @@ func poder(id: String) -> Dictionary:
 	assert(poderes.has(id), "Poder desconocido: %s" % id)
 	return poderes[id]
 
+
+
+func comandante(id: String) -> Dictionary:
+	assert(comandantes.has(id), "Comandante desconocido: %s" % id)
+	return comandantes[id]

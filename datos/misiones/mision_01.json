@@ -1,16 +1,115 @@
 {
-	"_nota": "Primera misión de prueba. Los enemigos salen en grupos mientras el obstáculo siga en pie; pasado el límite de tiempo llega la horda.",
-	"aparicion": {
-		"tipo": "basico",
-		"retraso_inicial": 4,
-		"intervalo_inicial": 15,
-		"intervalo_minimo": 15,
-		"reduccion_por_segundo": 0,
-		"grupo_inicial": 5,
-		"grupo_maximo": 5,
-		"grupo_crece_cada": 0,
-		"separacion_grupo": 25
-	},
+	"_nota": "Primera misión de prueba. Las oleadas salen en orden; cada una espera 'espera' segundos tras la anterior. Al acabar la lista se repite desde 'repetir_desde' sumando 'aumento_por_repeticion' a cada grupo. carril: un número (0 arriba, 2 abajo), 'azar' o 'todos'. Pasado el límite de tiempo llega la horda.",
+	"oleadas": [
+		{
+			"espera": 4,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 4,
+					"carril": 1
+				}
+			]
+		},
+		{
+			"espera": 12,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 4,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 12,
+			"grupos": [
+				{
+					"tipo": "rapido",
+					"cantidad": 4,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 14,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 4,
+					"carril": "azar"
+				},
+				{
+					"tipo": "armado",
+					"cantidad": 2,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 14,
+			"grupos": [
+				{
+					"tipo": "tanque",
+					"cantidad": 1,
+					"carril": "azar"
+				},
+				{
+					"tipo": "basico",
+					"cantidad": 2,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 14,
+			"grupos": [
+				{
+					"tipo": "explosivo",
+					"cantidad": 2,
+					"carril": "azar"
+				},
+				{
+					"tipo": "rapido",
+					"cantidad": 2,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 14,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 2,
+					"carril": "todos"
+				}
+			]
+		},
+		{
+			"espera": 14,
+			"grupos": [
+				{
+					"tipo": "armado",
+					"cantidad": 2,
+					"carril": "azar"
+				},
+				{
+					"tipo": "tanque",
+					"cantidad": 1,
+					"carril": "azar"
+				},
+				{
+					"tipo": "rapido",
+					"cantidad": 2,
+					"carril": "azar"
+				}
+			]
+		}
+	],
+	"repetir_desde": 3,
+	"aumento_por_repeticion": 1,
+	"separacion_grupo": 25,
 	"horda": {
 		"tipo": "horda",
 		"cantidad": 15,

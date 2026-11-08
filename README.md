@@ -1,6 +1,6 @@
 # Island of Flavors
 
-Juego de combate 2D lateral en un carril: despliegas unidades con un recurso que se recarga solo para destruir el obstáculo enemigo mientras proteges tu base. Motor: **Godot 4** (GDScript), pensado para **móvil en horizontal**.
+Juego de combate 2D lateral en tres carriles: despliegas unidades con un recurso que se recarga solo para destruir el obstáculo enemigo mientras proteges tu base. Motor: **Godot 4** (GDScript), pensado para **móvil en horizontal**.
 
 Estado actual: **prototipo gris** (Fase 1 del plan). Formas grises, sin arte ni sonido.
 

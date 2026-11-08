@@ -1,6 +1,7 @@
 class_name Hud
 extends CanvasLayer
-## Interfaz de la batalla: vidas, tiempo, recursos, mazo y poder de combate.
+## Interfaz de la batalla: vidas, tiempo, recursos, mazo, poder de combate y
+## habilidad del comandante.
 ## Se construye por código para que el prototipo gris sea fácil de cambiar.
 
 @onready var batalla: Batalla = get_parent()
@@ -16,6 +17,7 @@ var _texto_combate := Label.new()
 var _barra_combate := ProgressBar.new()
 var _boton_poder := Button.new()
 var _cortina_poder := ColorRect.new()
+var _boton_comandante := Button.new()
 var _zona_apuntado := Control.new()
 var _pantalla_fin := PantallaFin.new()
 var _apuntando := false
@@ -130,15 +132,18 @@ func _construir_panel_inferior() -> void:
 		boton.configurar(batalla.mazo[i] if i < batalla.mazo.size() else "", batalla)
 		fila_mazo.add_child(boton)
 
-	# Recurso de combate y poder.
+	# Recurso de combate, poder y habilidad del comandante.
 	var derecha := VBoxContainer.new()
-	derecha.custom_minimum_size.x = 220
+	derecha.custom_minimum_size.x = 300
 	columnas.add_child(derecha)
 	derecha.add_child(_texto_combate)
 	_barra_combate.show_percentage = false
 	_barra_combate.custom_minimum_size.y = 18
 	derecha.add_child(_barra_combate)
-	_boton_poder.custom_minimum_size = Vector2(220, 96)
+	var fila_poderes := HBoxContainer.new()
+	fila_poderes.add_theme_constant_override("separation", 8)
+	derecha.add_child(fila_poderes)
+	_boton_poder.custom_minimum_size = Vector2(140, 96)
 	_boton_poder.focus_mode = Control.FOCUS_NONE
 	_boton_poder.clip_contents = true
 	_boton_poder.text = "%s\n%d" % [Textos.t("poder." + batalla.poder.id), int(batalla.poder.coste)]
@@ -146,7 +151,14 @@ func _construir_panel_inferior() -> void:
 	_cortina_poder.color = Color(0, 0, 0, 0.55)
 	_cortina_poder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_boton_poder.add_child(_cortina_poder)
-	derecha.add_child(_boton_poder)
+	fila_poderes.add_child(_boton_poder)
+	var comandante := batalla.comandante
+	_boton_comandante.custom_minimum_size = Vector2(152, 96)
+	_boton_comandante.focus_mode = Control.FOCUS_NONE
+	_boton_comandante.text = "%s\n%s %d" % [Textos.t("comandante." + comandante.id),
+		Textos.t("habilidad." + comandante.habilidad), int(comandante.coste)]
+	_boton_comandante.pressed.connect(func() -> void: batalla.usar_comandante())
+	fila_poderes.add_child(_boton_comandante)
 
 
 func _process(_delta: float) -> void:
@@ -162,6 +174,9 @@ func _process(_delta: float) -> void:
 			_aviso.text = ""
 	if _apuntando:
 		_aviso.text = Textos.t("poder.apuntar", {"nombre": Textos.t("poder." + batalla.poder.id).to_lower()})
+	elif batalla.tiempo < 6.0 and _aviso.text.is_empty():
+		_aviso.text = Textos.t("carril.elegir")
+	_boton_comandante.disabled = not batalla.comandante_listo()
 
 	var poder := batalla.poder
 	_boton_poder.disabled = not poder.listo(batalla.recurso_combate) or batalla.terminada
@@ -208,7 +223,10 @@ func _cancelar_apuntado() -> void:
 func _on_toque_carril(evento: InputEvent) -> void:
 	if evento is InputEventMouseButton and evento.pressed and evento.button_index == MOUSE_BUTTON_LEFT:
 		var punto: Vector2 = batalla.get_canvas_transform().affine_inverse() * evento.global_position
-		batalla.soltar_poder(punto.x)
+		var carril := batalla.carril_en(punto.y)
+		if carril < 0:
+			return  # Fuera de los carriles: sigue apuntando.
+		batalla.soltar_poder(punto.x, carril)
 		_cancelar_apuntado()
 
 

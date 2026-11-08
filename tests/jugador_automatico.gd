@@ -14,19 +14,31 @@ func _physics_process(_delta: float) -> void:
 		return
 	match estrategia:
 		Estrategia.SOLO_LUCHADORES:
+			batalla.elegir_carril(_carril_mas_amenazado())
 			batalla.invocar("luchador_barato")
 		Estrategia.MIXTO:
 			_jugar_mixto()
 
 
-## Una estrategia razonable: apoyo si la base sufre, frente con peso pesado,
-## francotirador y tiradores detrás, luchadores de relleno, y el explosivo
-## sobre los grupos. Ahorra para la primera unidad lista de la lista.
+## Una estrategia razonable: refuerza el carril más amenazado con peso
+## pesado, francotirador y tiradores, apoyo si la base sufre, luchadores de
+## relleno, el explosivo sobre los grupos y el general cuando se puede.
 func _jugar_mixto() -> void:
+	if batalla.comandante_listo():
+		batalla.usar_comandante()
+	# El explosivo solo si sobra para el general, o ante un grupo grande.
 	if batalla.poder.listo(batalla.recurso_combate):
-		var x := _centro_del_grupo()
-		if not is_nan(x):
-			batalla.soltar_poder(x)
+		var objetivo := _mejor_grupo()
+		var sobra := batalla.recurso_combate.actual >= batalla.poder.coste + batalla.comandante.coste
+		if objetivo.y >= 0 and (sobra or _cuenta_grupo >= 5):
+			batalla.soltar_poder(objetivo.x, int(objetivo.y))
+	var carril := _carril_mas_amenazado()
+	batalla.elegir_carril(carril)
+	# Urgencia: enemigos cerca de la base sin nadie que los frene.
+	if _urgente(carril):
+		for id: String in ["luchador_barato", "tirador", "peso_pesado"]:
+			if batalla.invocar(id) != null:
+				return
 	var prioridad: Array[String] = []
 	if batalla.base.fraccion_vida() < 0.85 and _contar("apoyo") == 0:
 		prioridad.append("apoyo")
@@ -37,6 +49,33 @@ func _jugar_mixto() -> void:
 			return
 
 
+## El carril con más vida enemiga sin cubrir, pesando más a los que están
+## cerca de la base. Sin enemigos, el carril con menos unidades.
+func _carril_mas_amenazado() -> int:
+	var mejor := 0
+	var mejor_valor := -INF
+	for c in batalla.suelos.size():
+		var valor := 0.0
+		for e: Enemigo in batalla.enemigos_en(c):
+			var cercania := 1.0 + (1200.0 - e.position.x) / 600.0
+			valor += e.vida * cercania
+		for u: Unidad in batalla.unidades_en(c):
+			valor -= u.vida * 0.8
+		if valor > mejor_valor:
+			mejor = c
+			mejor_valor = valor
+	return mejor
+
+
+func _urgente(carril: int) -> bool:
+	if not batalla.unidades_en(carril).is_empty():
+		return false
+	for e: Enemigo in batalla.enemigos_en(carril):
+		if e.position.x < 800.0:
+			return true
+	return false
+
+
 func _contar(id: String) -> int:
 	var n := 0
 	for u: Unidad in batalla.unidades():
@@ -45,16 +84,23 @@ func _contar(id: String) -> int:
 	return n
 
 
-## Posición con más enemigos dentro del radio del poder (NAN si hay pocos).
-func _centro_del_grupo() -> float:
-	var mejor := NAN
+## Posición (x) y carril (y) con más enemigos dentro del radio del poder.
+## Devuelve y = -1 si no hay un grupo de al menos tres.
+var _cuenta_grupo := 0
+
+
+func _mejor_grupo() -> Vector2:
+	var mejor := Vector2(0, -1)
 	var mejor_cuenta := 2
-	for e: Enemigo in batalla.enemigos():
-		var cuenta := 0
-		for otro: Enemigo in batalla.enemigos():
-			if absf(otro.position.x - e.position.x) <= batalla.poder.radio:
-				cuenta += 1
-		if cuenta > mejor_cuenta:
-			mejor = e.position.x
-			mejor_cuenta = cuenta
+	for c in batalla.suelos.size():
+		var enemigos := batalla.enemigos_en(c)
+		for e: Enemigo in enemigos:
+			var cuenta := 0
+			for otro: Enemigo in enemigos:
+				if absf(otro.position.x - e.position.x) <= batalla.poder.radio:
+					cuenta += 1
+			if cuenta > mejor_cuenta:
+				mejor = Vector2(e.position.x, c)
+				mejor_cuenta = cuenta
+	_cuenta_grupo = mejor_cuenta
 	return mejor

@@ -18,6 +18,8 @@ var intervalo_ataque := 1.0
 var alcance := 20.0
 var rango_deteccion := 150.0
 var velocidad := 0.0
+## Carril en el que está (0 arriba). Solo pelea con quien esté en su carril.
+var carril := 0
 ## +1 avanza hacia la derecha (unidades), -1 hacia la izquierda (enemigos).
 var direccion := 1.0
 var tamano := Vector2(26, 46)
@@ -31,8 +33,9 @@ var _destello_hasta := 0.0
 var _vivo := true
 
 
-func configurar(id_: String, datos_: Dictionary, batalla_: Batalla) -> void:
+func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
 	id = id_
+	carril = carril_
 	datos = datos_
 	batalla = batalla_
 	vida_maxima = float(datos.get("vida", 1))
@@ -116,12 +119,13 @@ func morir() -> void:
 	queue_free()
 
 
-## El combatiente vivo más cercano de una lista, dentro del rango de detección.
+## El combatiente vivo más cercano de una lista, en el mismo carril y dentro
+## del rango de detección.
 func mas_cercano(candidatos: Array) -> Combatiente:
 	var mejor: Combatiente = null
 	var mejor_distancia := rango_deteccion
 	for c: Combatiente in candidatos:
-		if not c.esta_vivo():
+		if not c.esta_vivo() or c.carril != carril:
 			continue
 		var d := c.distancia_desde(position.x) - radio()
 		if d <= mejor_distancia:

@@ -7,8 +7,8 @@ var comportamiento := "combate"
 var reparacion_por_segundo := 0.0
 
 
-func configurar(id_: String, datos_: Dictionary, batalla_: Batalla) -> void:
-	super(id_, datos_, batalla_)
+func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
+	super(id_, datos_, batalla_, carril_)
 	direccion = 1.0
 	comportamiento = datos.get("comportamiento", "combate")
 	reparacion_por_segundo = float(datos.get("reparacion_por_segundo", 0))
