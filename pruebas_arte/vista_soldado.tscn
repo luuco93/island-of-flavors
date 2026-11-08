@@ -13,5 +13,5 @@ color = Color(0.82, 0.74, 0.6, 1)
 polygon = PackedVector2Array(0, 600, 1280, 600, 1280, 720, 0, 720)
 
 [node name="Soldado" parent="." instance=ExtResource("1")]
-position = Vector2(560, 605)
+position = Vector2(700, 605)
 scale = Vector2(1.6, 1.6)
