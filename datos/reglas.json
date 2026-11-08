@@ -1,0 +1,21 @@
+{
+	"_nota": "Reglas globales de la batalla. Cifras de la tabla de parámetros del documento de mecánica.",
+	"recurso_despliegue": { "inicial": 20, "maximo": 100, "recarga_por_segundo": 2 },
+	"recurso_combate": { "inicial": 0, "maximo": 100 },
+	"vida_base": 1000,
+	"vida_obstaculo": 3000,
+	"limite_tiempo": 180,
+	"aviso_horda": 10,
+	"estrellas": { "tres": 0.70, "dos": 0.35 },
+	"tamano_mazo": 6,
+	"mazo_inicial": ["luchador_barato", "peso_pesado", "tirador", "francotirador", "apoyo"],
+	"poderes_iniciales": ["explosivo"],
+	"carril": {
+		"suelo_y": 470,
+		"base_x": 80,
+		"obstaculo_x": 1200,
+		"aparicion_unidades_x": 150,
+		"aparicion_enemigos_x": 1140,
+		"dispersion_y": 24
+	}
+}

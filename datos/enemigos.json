@@ -1,0 +1,13 @@
+{
+	"_nota": "Propuesta para el prototipo. recurso_combate es lo que suma cada baja (1 a 5 según tipo).",
+	"basico": {
+		"vida": 100, "dano": 12, "intervalo_ataque": 1.2,
+		"alcance": 20, "rango_deteccion": 150, "velocidad": 40,
+		"recurso_combate": 1, "tamano": [28, 48], "tono": 0.3
+	},
+	"horda": {
+		"vida": 260, "dano": 20, "intervalo_ataque": 1.0,
+		"alcance": 20, "rango_deteccion": 150, "velocidad": 75,
+		"recurso_combate": 3, "tamano": [30, 50], "tono": 0.15
+	}
+}

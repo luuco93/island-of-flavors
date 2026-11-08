@@ -1,0 +1,21 @@
+{
+	"_nota": "Textos que ve el jugador. Cambiar aquí los nombres al definir la temática; el código usa solo las claves.",
+	"base": "Base",
+	"obstaculo": "Obstáculo",
+	"recurso_despliegue": "Despliegue",
+	"recurso_combate": "Combate",
+	"unidad.luchador_barato": "Luchador",
+	"unidad.peso_pesado": "Peso pesado",
+	"unidad.tirador": "Tirador",
+	"unidad.francotirador": "Francotirador",
+	"unidad.apoyo": "Apoyo",
+	"poder.explosivo": "Explosivo",
+	"mazo.vacio": "—",
+	"poder.apuntar": "Toca el carril para soltar el {nombre}",
+	"aviso.horda": "¡Se acerca la horda! {segundos}",
+	"aviso.horda_llego": "¡Horda!",
+	"fin.victoria": "Victoria",
+	"fin.derrota": "Derrota",
+	"fin.vida_base": "Vida de la base: {porcentaje} %",
+	"fin.reintentar": "Reintentar"
+}

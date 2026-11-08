@@ -1,0 +1,33 @@
+; Archivo de configuración del proyecto de Godot 4.
+
+config_version=5
+
+[application]
+
+config/name="Island of Flavors"
+config/description="Prototipo gris del combate en carril."
+run/main_scene="res://escenas/batalla/batalla.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[autoload]
+
+Datos="*res://scripts/autoload/datos.gd"
+Textos="*res://scripts/autoload/textos.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.86, 0.86, 0.86, 1)

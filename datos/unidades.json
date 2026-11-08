@@ -1,0 +1,29 @@
+{
+	"_nota": "Coste, preparación, vida, daño y alcance vienen del documento. Velocidad, intervalo de ataque, rango de detección y tamaño son propuestas para el prototipo. Distancias en píxeles, tiempos en segundos.",
+	"luchador_barato": {
+		"coste": 10, "preparacion": 3, "vida": 150, "dano": 30, "intervalo_ataque": 1.0,
+		"alcance": 20, "rango_deteccion": 200, "velocidad": 70,
+		"comportamiento": "combate", "tamano": [26, 46], "tono": 0.62
+	},
+	"peso_pesado": {
+		"coste": 30, "preparacion": 25, "vida": 900, "dano": 60, "intervalo_ataque": 1.5,
+		"alcance": 20, "rango_deteccion": 200, "velocidad": 45,
+		"comportamiento": "combate", "tamano": [40, 62], "tono": 0.5
+	},
+	"tirador": {
+		"coste": 20, "preparacion": 10, "vida": 120, "dano": 15, "intervalo_ataque": 0.8,
+		"alcance": 220, "rango_deteccion": 280, "velocidad": 55,
+		"comportamiento": "combate", "tamano": [24, 44], "tono": 0.7
+	},
+	"francotirador": {
+		"coste": 35, "preparacion": 30, "vida": 100, "dano": 120, "intervalo_ataque": 2.5,
+		"alcance": 480, "rango_deteccion": 520, "velocidad": 50,
+		"comportamiento": "combate", "tamano": [22, 42], "tono": 0.78
+	},
+	"apoyo": {
+		"coste": 25, "preparacion": 30, "vida": 150, "dano": 0, "intervalo_ataque": 1.0,
+		"alcance": 0, "rango_deteccion": 0, "velocidad": 0,
+		"comportamiento": "reparar_base", "reparacion_por_segundo": 10,
+		"tamano": [24, 40], "tono": 0.85
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"_nota": "Primera misión de prueba. La aparición se acelera con el tiempo mientras el obstáculo siga en pie.",
+	"aparicion": {
+		"tipo": "basico",
+		"retraso_inicial": 4,
+		"intervalo_inicial": 5.0,
+		"intervalo_minimo": 2.0,
+		"reduccion_por_segundo": 0.02
+	},
+	"horda": {
+		"tipo": "horda",
+		"cantidad": 15,
+		"intervalo": 0.6,
+		"intervalo_despues": 1.5
+	}
+}
