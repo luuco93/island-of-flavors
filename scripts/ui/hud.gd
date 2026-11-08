@@ -29,6 +29,9 @@ func _ready() -> void:
 	_raiz.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tema := Theme.new()
 	tema.default_font_size = 22
+	tema.set_stylebox("background", "ProgressBar", _caja(Color(0.62, 0.62, 0.62)))
+	tema.set_stylebox("fill", "ProgressBar", _caja(Color(0.22, 0.22, 0.22)))
+	tema.set_color("font_color", "Label", Color(0.1, 0.1, 0.1))
 	_raiz.theme = tema
 	add_child(_raiz)
 
@@ -63,6 +66,13 @@ func _ready() -> void:
 	_actualizar_barra(batalla.obstaculo.vida, batalla.obstaculo.vida_maxima, _barra_obstaculo)
 	_on_despliegue(batalla.recurso_despliegue.actual, batalla.recurso_despliegue.maximo)
 	_on_combate(batalla.recurso_combate.actual, batalla.recurso_combate.maximo)
+
+
+func _caja(color: Color) -> StyleBoxFlat:
+	var caja := StyleBoxFlat.new()
+	caja.bg_color = color
+	caja.set_corner_radius_all(4)
+	return caja
 
 
 func _construir_barra_superior() -> void:

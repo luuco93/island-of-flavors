@@ -1,11 +1,15 @@
 {
-	"_nota": "Primera misión de prueba. La aparición se acelera con el tiempo mientras el obstáculo siga en pie.",
+	"_nota": "Primera misión de prueba. Los enemigos salen en grupos mientras el obstáculo siga en pie; pasado el límite de tiempo llega la horda.",
 	"aparicion": {
 		"tipo": "basico",
 		"retraso_inicial": 4,
-		"intervalo_inicial": 5.0,
-		"intervalo_minimo": 2.0,
-		"reduccion_por_segundo": 0.02
+		"intervalo_inicial": 15,
+		"intervalo_minimo": 15,
+		"reduccion_por_segundo": 0,
+		"grupo_inicial": 5,
+		"grupo_maximo": 5,
+		"grupo_crece_cada": 0,
+		"separacion_grupo": 25
 	},
 	"horda": {
 		"tipo": "horda",
