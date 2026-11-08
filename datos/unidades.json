@@ -3,7 +3,13 @@
 	"luchador_barato": {
 		"coste": 10, "preparacion": 3, "vida": 150, "dano": 30, "intervalo_ataque": 1.0,
 		"alcance": 20, "rango_deteccion": 200, "velocidad": 70,
-		"comportamiento": "combate", "tamano": [26, 46], "tono": 0.62
+		"comportamiento": "combate", "tamano": [26, 46], "tono": 0.62,
+		"carta": "res://arte/cartas/luchador_barato.jpg",
+		"visual": {
+			"_nota": "Personaje animado por piezas. escala: tamaño en batalla. alto: alto del dibujo a escala 1 (para la barra de vida). zancada: px/s a escala 1 a los que los pies no patinan al correr.",
+			"escena": "res://arte/unidades/luchador_barato/luchador_barato.tscn",
+			"escala": 0.11, "alto": 600, "zancada": 564
+		}
 	},
 	"peso_pesado": {
 		"coste": 30, "preparacion": 25, "vida": 900, "dano": 60, "intervalo_ataque": 1.5,

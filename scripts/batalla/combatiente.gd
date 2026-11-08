@@ -37,6 +37,15 @@ var _destello_hasta := 0.0
 var _vivo := true
 var _desvio_y := 0.0
 
+## Dibujo animado por piezas (si los datos traen "visual"); sin él se
+## dibuja el rectángulo gris del prototipo.
+var visual: Node2D = null
+var _animacion: AnimationPlayer = null
+var _escala_visual := 1.0
+var _alto_visual := 0.0
+var _zancada := 0.0
+var _posicion_anterior := Vector2.ZERO
+
 
 func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
 	id = id_
@@ -54,6 +63,22 @@ func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int
 	var t: Array = datos.get("tamano", [26, 46])
 	tamano = Vector2(t[0], t[1])
 	color = Color.from_hsv(0.0, 0.0, float(datos.get("tono", 0.5)))
+	if datos.has("visual"):
+		_crear_visual(datos.visual)
+
+
+func _crear_visual(info: Dictionary) -> void:
+	var escena := load(info.escena) as PackedScene
+	if escena == null:
+		push_error("No se pudo cargar %s" % info.escena)
+		return
+	visual = escena.instantiate()
+	_escala_visual = float(info.get("escala", 1.0))
+	_alto_visual = float(info.get("alto", 0.0)) * _escala_visual
+	_zancada = float(info.get("zancada", 0.0)) * _escala_visual
+	visual.scale = Vector2(_escala_visual * direccion, _escala_visual)
+	add_child(visual)
+	_animacion = visual.get_node_or_null("AnimationPlayer")
 
 
 func esta_vivo() -> bool:
@@ -76,7 +101,35 @@ func _physics_process(delta: float) -> void:
 		_destello = maxf(0.0, _destello - delta)
 		if _destello == 0.0:
 			queue_redraw()
+	_posicion_anterior = position
 	actuar(delta)
+	if visual != null:
+		_animar()
+
+
+## Elige la animación según lo que hizo en este paso: correr si se movió,
+## quieto si no, y deja terminar el ataque si está en curso.
+func _animar() -> void:
+	var paso := position - _posicion_anterior
+	# Mira hacia donde camina o, si está quieto, hacia su objetivo.
+	var mirar := direccion
+	if absf(paso.x) > 0.001:
+		mirar = signf(paso.x)
+	elif objetivo != null and is_instance_valid(objetivo) and not is_equal_approx(objetivo.position.x, position.x):
+		mirar = signf(objetivo.position.x - position.x)
+	visual.scale.x = absf(visual.scale.x) * mirar
+	if _animacion == null:
+		return
+	if _animacion.current_animation == "attack" and _animacion.is_playing() \
+			and paso.length() <= 0.001:
+		return
+	if paso.length() > 0.001:
+		if _animacion.current_animation != "run":
+			_animacion.play("run", 0.12)
+		_animacion.speed_scale = velocidad / _zancada if _zancada > 0.0 else 1.0
+	elif _animacion.current_animation != "idle":
+		_animacion.play("idle", 0.2)
+		_animacion.speed_scale = 1.0
 
 
 ## Un paso de comportamiento. Las subclases pueden reemplazarlo.
@@ -136,6 +189,10 @@ func atacar(blanco) -> void:
 	_espera_ataque = intervalo_ataque
 	_destello = DURACION_DESTELLO
 	_destello_hasta = blanco.position.x - position.x
+	if _animacion != null and _animacion.has_animation("attack"):
+		# Si ataca más rápido de lo que dura el golpe, lo acelera.
+		_animacion.play("attack", 0.08)
+		_animacion.speed_scale = maxf(1.0, _animacion.current_animation_length / intervalo_ataque)
 	queue_redraw()
 
 
@@ -173,15 +230,19 @@ func mas_cercano(candidatos: Array) -> Combatiente:
 
 
 func _draw() -> void:
-	var rect := Rect2(-tamano.x / 2.0, -tamano.y, tamano.x, tamano.y)
-	draw_rect(rect, color)
-	draw_rect(rect, Color(0.1, 0.1, 0.1), false, 1.5)
+	var alto := tamano.y
+	if visual != null:
+		alto = _alto_visual
+	else:
+		var rect := Rect2(-tamano.x / 2.0, -tamano.y, tamano.x, tamano.y)
+		draw_rect(rect, color)
+		draw_rect(rect, Color(0.1, 0.1, 0.1), false, 1.5)
 	# Barra de vida.
 	var ancho_barra := tamano.x + 6.0
-	var y := -tamano.y - 8.0
+	var y := -alto - 8.0
 	draw_rect(Rect2(-ancho_barra / 2.0, y, ancho_barra, 4.0), Color(0.2, 0.2, 0.2))
 	draw_rect(Rect2(-ancho_barra / 2.0, y, ancho_barra * clampf(vida / vida_maxima, 0.0, 1.0), 4.0), Color(0.95, 0.95, 0.95))
 	# Línea de ataque.
-	if _destello > 0.0:
+	if _destello > 0.0 and visual == null:
 		var altura := -tamano.y * 0.6
 		draw_line(Vector2(0, altura), Vector2(_destello_hasta, altura), Color(0.05, 0.05, 0.05), 2.0)
