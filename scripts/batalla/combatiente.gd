@@ -45,6 +45,13 @@ var _escala_visual := 1.0
 var _alto_visual := 0.0
 var _zancada := 0.0
 var _posicion_anterior := Vector2.ZERO
+## Ataques animados (de "visual.ataques"): el daño llega cuando la
+## animación golpea, no al empezar. Cada "fuerte_cada" ataques usa el fuerte.
+var _ataques_visuales: Dictionary = {}
+var _fuerte_cada := 0
+var _ataques_hechos := 0
+var _golpe_en := -1.0
+var _golpe_blanco = null
 
 
 func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
@@ -77,6 +84,8 @@ func _crear_visual(info: Dictionary) -> void:
 	_alto_visual = float(info.get("alto", 0.0)) * _escala_visual
 	_zancada = float(info.get("zancada", 0.0)) * _escala_visual
 	visual.scale = Vector2(_escala_visual * direccion, _escala_visual)
+	_ataques_visuales = info.get("ataques", {})
+	_fuerte_cada = int(info.get("fuerte_cada", 0))
 	add_child(visual)
 	_animacion = visual.get_node_or_null("AnimationPlayer")
 
@@ -101,6 +110,10 @@ func _physics_process(delta: float) -> void:
 		_destello = maxf(0.0, _destello - delta)
 		if _destello == 0.0:
 			queue_redraw()
+	if _golpe_en >= 0.0:
+		_golpe_en -= delta
+		if _golpe_en < 0.0:
+			_golpear()
 	_posicion_anterior = position
 	actuar(delta)
 	if visual != null:
@@ -120,7 +133,7 @@ func _animar() -> void:
 	visual.scale.x = absf(visual.scale.x) * mirar
 	if _animacion == null:
 		return
-	if _animacion.current_animation == "attack" and _animacion.is_playing() \
+	if _animacion.current_animation.begins_with("attack") and _animacion.is_playing() \
 			and paso.length() <= 0.001:
 		return
 	if paso.length() > 0.001:
@@ -185,15 +198,41 @@ func mover(delta: float, hacia_x: float = NAN) -> void:
 
 
 func atacar(blanco) -> void:
-	blanco.recibir_dano(dano)
 	_espera_ataque = intervalo_ataque
 	_destello = DURACION_DESTELLO
 	_destello_hasta = blanco.position.x - position.x
-	if _animacion != null and _animacion.has_animation("attack"):
-		# Si ataca más rápido de lo que dura el golpe, lo acelera.
-		_animacion.play("attack", 0.08)
-		_animacion.speed_scale = maxf(1.0, _animacion.current_animation_length / intervalo_ataque)
+	if _animacion != null and not _ataques_visuales.is_empty():
+		_atacar_animado(blanco)
+	else:
+		blanco.recibir_dano(dano)
+		if _animacion != null and _animacion.has_animation("attack"):
+			# Si ataca más rápido de lo que dura el golpe, lo acelera.
+			_animacion.play("attack", 0.08)
+			_animacion.speed_scale = maxf(1.0, _animacion.current_animation_length / intervalo_ataque)
 	queue_redraw()
+
+
+## Ataque normal o, cada "fuerte_cada" ataques, el fuerte. El normal se
+## acelera si no cabe en el intervalo de ataque; el fuerte se ve completo y
+## alarga la espera hasta el siguiente ataque.
+func _atacar_animado(blanco) -> void:
+	_ataques_hechos += 1
+	var fuerte := _fuerte_cada > 0 and _ataques_hechos % _fuerte_cada == 0 \
+		and _ataques_visuales.has("fuerte")
+	var info: Dictionary = _ataques_visuales["fuerte" if fuerte else "normal"]
+	_animacion.play(info.animacion, 0.08)
+	var largo := _animacion.current_animation_length
+	_animacion.speed_scale = 1.0 if fuerte else maxf(1.0, largo / intervalo_ataque)
+	if fuerte:
+		_espera_ataque = maxf(intervalo_ataque, largo)
+	_golpe_blanco = blanco
+	_golpe_en = float(info.get("golpe", 0.0)) / _animacion.speed_scale
+
+
+func _golpear() -> void:
+	if _golpe_blanco != null and is_instance_valid(_golpe_blanco) and _golpe_blanco.esta_vivo():
+		_golpe_blanco.recibir_dano(dano)
+	_golpe_blanco = null
 
 
 func recibir_dano(cantidad: float) -> void:

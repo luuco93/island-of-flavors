@@ -47,7 +47,15 @@ func _jugar_mixto() -> void:
 			return
 
 
+## Urgencia: enemigos cerca de la base sin nadie que los frene, o ya en la
+## puerta de la base y más que las unidades del carril (rápidos colados).
 func _urgente(carril: int) -> bool:
+	var en_puerta := 0
+	for e: Enemigo in batalla.enemigos_en(carril):
+		if e.position.x < 350.0:
+			en_puerta += 1
+	if en_puerta > batalla.unidades_en(carril).size():
+		return true
 	if not batalla.unidades_en(carril).is_empty():
 		return false
 	for e: Enemigo in batalla.enemigos_en(carril):
