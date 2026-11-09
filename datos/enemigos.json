@@ -1,0 +1,98 @@
+{
+	"_nota": "Propuesta para el prototipo. recurso_combate es lo que suma cada baja (1 a 5 según tipo). marca solo distingue la forma gris en pantalla. ignora_unidades: no se detiene ante las unidades y va directo a la base.",
+	"basico": {
+		"vida": 124,
+		"dano": 10.2,
+		"intervalo_ataque": 1.0,
+		"alcance": 20,
+		"rango_deteccion": 150,
+		"velocidad": 40,
+		"recurso_combate": 2,
+		"tamano": [
+			28,
+			48
+		],
+		"tono": 0.3,
+		"marca": "diagonal"
+	},
+	"rapido": {
+		"vida": 110,
+		"dano": 35,
+		"intervalo_ataque": 0.7,
+		"alcance": 20,
+		"rango_deteccion": 150,
+		"velocidad": 95,
+		"recurso_combate": 2,
+		"tamano": [
+			22,
+			40
+		],
+		"tono": 0.4,
+		"marca": "flecha",
+		"ignora_unidades": true
+	},
+	"tanque": {
+		"vida": 932,
+		"dano": 29.8,
+		"intervalo_ataque": 1.6,
+		"alcance": 25,
+		"rango_deteccion": 150,
+		"velocidad": 22,
+		"recurso_combate": 5,
+		"tamano": [
+			48,
+			70
+		],
+		"tono": 0.18,
+		"marca": "diagonal"
+	},
+	"armado": {
+		"vida": 93,
+		"dano": 8.5,
+		"intervalo_ataque": 1.0,
+		"alcance": 180,
+		"rango_deteccion": 220,
+		"velocidad": 38,
+		"recurso_combate": 3,
+		"tamano": [
+			24,
+			46
+		],
+		"tono": 0.35,
+		"marca": "mira"
+	},
+	"explosivo": {
+		"vida": 166,
+		"dano": 8.5,
+		"intervalo_ataque": 1.2,
+		"alcance": 20,
+		"rango_deteccion": 150,
+		"velocidad": 32,
+		"recurso_combate": 3,
+		"tamano": [
+			36,
+			44
+		],
+		"tono": 0.25,
+		"marca": "circulo",
+		"explota_al_morir": {
+			"dano": 90,
+			"radio": 80
+		}
+	},
+	"horda": {
+		"vida": 269,
+		"dano": 17.0,
+		"intervalo_ataque": 1.0,
+		"alcance": 20,
+		"rango_deteccion": 150,
+		"velocidad": 75,
+		"recurso_combate": 3,
+		"tamano": [
+			30,
+			50
+		],
+		"tono": 0.12,
+		"marca": "doble"
+	}
+}

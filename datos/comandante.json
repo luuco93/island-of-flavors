@@ -1,0 +1,9 @@
+{
+	"_nota": "Comandante de la base (el general de la región). Su habilidad activa se paga con el recurso de combate (compite con el explosivo). Con coste 100 solo se usaría con la barra llena, como dice el plan; 60 permite usarla una o dos veces por misión.",
+	"general": {
+		"habilidad": "andanada",
+		"coste": 60,
+		"dano": 200,
+		"empuje": 120
+	}
+}

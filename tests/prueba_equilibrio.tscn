@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1l5tnd77ktwt"]
+
+[ext_resource type="Script" uid="uid://daikd2ayxcxis" path="res://tests/prueba_equilibrio.gd" id="1_prueba"]
+
+[node name="PruebaEquilibrio" type="Node"]
+script = ExtResource("1_prueba")

@@ -1,0 +1,4 @@
+{
+	"_nota": "Poderes de combate: se pagan con el recurso de combate.",
+	"explosivo": { "coste": 40, "espera": 15, "dano": 300, "radio": 120 }
+}

@@ -1,0 +1,119 @@
+{
+	"_nota": "Primera misión de prueba. Las oleadas salen en orden; cada una espera 'espera' segundos tras la anterior. Al acabar la lista se repite desde 'repetir_desde' sumando 'aumento_por_repeticion' a cada grupo. carril: un número (0 arriba, 2 abajo), 'azar' o 'todos'. Pasado el límite de tiempo llega la horda.",
+	"oleadas": [
+		{
+			"espera": 4.6,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 4,
+					"carril": 1
+				}
+			]
+		},
+		{
+			"espera": 13.8,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 4,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 13.8,
+			"grupos": [
+				{
+					"tipo": "rapido",
+					"cantidad": 5,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 16.1,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 4,
+					"carril": "azar"
+				},
+				{
+					"tipo": "armado",
+					"cantidad": 2,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 16.1,
+			"grupos": [
+				{
+					"tipo": "tanque",
+					"cantidad": 1,
+					"carril": "azar"
+				},
+				{
+					"tipo": "basico",
+					"cantidad": 2,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 16.1,
+			"grupos": [
+				{
+					"tipo": "explosivo",
+					"cantidad": 2,
+					"carril": "azar"
+				},
+				{
+					"tipo": "rapido",
+					"cantidad": 5,
+					"carril": "azar"
+				}
+			]
+		},
+		{
+			"espera": 16.1,
+			"grupos": [
+				{
+					"tipo": "basico",
+					"cantidad": 2,
+					"carril": "todos"
+				}
+			]
+		},
+		{
+			"espera": 16.1,
+			"grupos": [
+				{
+					"tipo": "armado",
+					"cantidad": 2,
+					"carril": "azar"
+				},
+				{
+					"tipo": "tanque",
+					"cantidad": 1,
+					"carril": "azar"
+				},
+				{
+					"tipo": "rapido",
+					"cantidad": 5,
+					"carril": "azar"
+				}
+			]
+		}
+	],
+	"repetir_desde": 3,
+	"aumento_por_repeticion": 1,
+	"separacion_grupo": 25,
+	"horda": {
+		"tipo": "horda",
+		"cantidad": 15,
+		"intervalo": 0.6,
+		"intervalo_despues": 1.5
+	}
+}

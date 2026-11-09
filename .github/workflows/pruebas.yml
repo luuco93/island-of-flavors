@@ -1,0 +1,22 @@
+name: Pruebas
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  equilibrio:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: 4.4.1-stable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar Godot
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}_linux.x86_64" godot
+      - name: Importar el proyecto
+        run: ./godot --headless --path . --import
+      - name: Prueba de equilibrio
+        run: ./godot --headless --path . --fixed-fps 60 res://tests/prueba_equilibrio.tscn

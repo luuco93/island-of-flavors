@@ -1,0 +1,328 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/cuerpo.png" id="1_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/galleta.png" id="2_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/brazo_mano.png" id="3_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/brazo_puno.png" id="4_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/pierna_atras.png" id="5_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/pierna_frente.png" id="6_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/paleta.png" id="7_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/ojo_izq.png" id="8_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/ojo_der.png" id="9_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/ceja_izq.png" id="10_t"]
+[ext_resource type="Texture2D" path="res://arte/unidades/soldado/piezas/ceja_der.png" id="11_t"]
+
+[sub_resource type="Animation" id="Anim_idle"]
+resource_name = "idle"
+length = 2.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Torso:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0000, 1.2000, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2),
+"update": 0,
+"values": [Vector2(0.000, -42.000), Vector2(0.000, -44.500), Vector2(0.000, -42.000)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Torso/Cuerpo:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.0000, 1.2000, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2),
+"update": 0,
+"values": [Vector2(1.000, 1.000), Vector2(0.985, 1.025), Vector2(1.000, 1.000)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Torso/Cuerpo/Galleta:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.0000, 0.3500, 1.5500, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2, -2),
+"update": 0,
+"values": [0.0000, -0.0087, 0.0436, 0.0000]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Torso/Cuerpo/Galleta:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.0000, 0.3000, 1.5000, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2, -2),
+"update": 0,
+"values": [Vector2(-4.000, -176.000), Vector2(-4.000, -176.000), Vector2(-4.000, -179.000), Vector2(-4.000, -176.000)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Torso/Cuerpo/BrazoMano:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.0000, 0.2000, 1.4000, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2, -2),
+"update": 0,
+"values": [1.0123, 1.0123, 0.9250, 1.0123]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Torso/Cuerpo/BrazoMano/Paleta:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.0000, 0.2000, 1.4000, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2, -2),
+"update": 0,
+"values": [-2.5831, -2.5831, -2.4958, -2.5831]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Torso/BrazoPuno:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.0000, 0.2500, 1.4500, 2.4000),
+"transitions": PackedFloat32Array(-2, -2, -2, -2),
+"update": 0,
+"values": [-1.0821, -1.0821, -1.2217, -1.0821]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Torso/Cuerpo/Cara/OjoIzq:scale")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.0000, 1.5500, 1.6200, 1.7000, 1.8000, 2.4000),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1.000, 1.000), Vector2(1.000, 1.000), Vector2(1.000, 0.120), Vector2(1.000, 0.120), Vector2(1.000, 1.000), Vector2(1.000, 1.000)]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Torso/Cuerpo/Cara/OjoDer:scale")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0.0000, 1.5500, 1.6200, 1.7000, 1.8000, 2.4000),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1.000, 1.000), Vector2(1.000, 1.000), Vector2(1.000, 0.120), Vector2(1.000, 0.120), Vector2(1.000, 1.000), Vector2(1.000, 1.000)]
+}
+
+[sub_resource type="Animation" id="Anim_RESET"]
+resource_name = "RESET"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Torso:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [Vector2(0.000, -42.000)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Torso/Cuerpo:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [Vector2(1.000, 1.000)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Torso/Cuerpo/Galleta:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [0.0000]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Torso/Cuerpo/Galleta:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [Vector2(-4.000, -176.000)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Torso/Cuerpo/BrazoMano:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [1.0123]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Torso/Cuerpo/BrazoMano/Paleta:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [-2.5831]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Torso/BrazoPuno:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(-2),
+"update": 0,
+"values": [-1.0821]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Torso/Cuerpo/Cara/OjoIzq:scale")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1.000, 1.000)]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Torso/Cuerpo/Cara/OjoDer:scale")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0.0000),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1.000, 1.000)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimLib"]
+_data = {
+&"RESET": SubResource("Anim_RESET"),
+&"idle": SubResource("Anim_idle")
+}
+
+[node name="Soldado" type="Node2D"]
+
+[node name="PiernaAtras" type="Sprite2D" parent="."]
+position = Vector2(50.000, -60.000)
+texture = ExtResource("5_t")
+centered = false
+offset = Vector2(-21.000, -16.900)
+
+[node name="Torso" type="Node2D" parent="."]
+position = Vector2(0.000, -42.000)
+
+[node name="BrazoPuno" type="Sprite2D" parent="Torso"]
+position = Vector2(76.000, -84.000)
+rotation = -1.0821
+texture = ExtResource("4_t")
+centered = false
+offset = Vector2(-17.200, -16.100)
+
+[node name="Cuerpo" type="Sprite2D" parent="Torso"]
+position = Vector2(0.000, 0.000)
+texture = ExtResource("1_t")
+centered = false
+offset = Vector2(-90.500, -208.000)
+
+[node name="Galleta" type="Sprite2D" parent="Torso/Cuerpo"]
+position = Vector2(-4.000, -176.000)
+texture = ExtResource("2_t")
+centered = false
+offset = Vector2(-82.000, -70.000)
+
+[node name="Cara" type="Node2D" parent="Torso/Cuerpo"]
+position = Vector2(36.000, -140.000)
+
+[node name="OjoIzq" type="Sprite2D" parent="Torso/Cuerpo/Cara"]
+position = Vector2(-32.000, 2.000)
+texture = ExtResource("8_t")
+centered = false
+offset = Vector2(-21.500, -20.500)
+
+[node name="OjoDer" type="Sprite2D" parent="Torso/Cuerpo/Cara"]
+position = Vector2(32.000, -3.000)
+texture = ExtResource("9_t")
+centered = false
+offset = Vector2(-21.500, -20.500)
+
+[node name="CejaIzq" type="Sprite2D" parent="Torso/Cuerpo/Cara"]
+position = Vector2(-26.000, -25.000)
+texture = ExtResource("10_t")
+centered = false
+offset = Vector2(-16.000, -12.000)
+
+[node name="CejaDer" type="Sprite2D" parent="Torso/Cuerpo/Cara"]
+position = Vector2(28.000, -28.000)
+texture = ExtResource("11_t")
+centered = false
+offset = Vector2(-16.000, -12.000)
+
+[node name="BrazoMano" type="Sprite2D" parent="Torso/Cuerpo"]
+position = Vector2(-70.000, -96.000)
+rotation = 1.0123
+texture = ExtResource("3_t")
+centered = false
+offset = Vector2(-40.600, -16.300)
+
+[node name="Paleta" type="Sprite2D" parent="Torso/Cuerpo/BrazoMano"]
+position = Vector2(-26.000, 69.000)
+rotation = -2.5831
+show_behind_parent = true
+texture = ExtResource("7_t")
+centered = false
+offset = Vector2(-52.000, -140.000)
+
+[node name="PiernaFrente" type="Sprite2D" parent="."]
+position = Vector2(-42.000, -62.000)
+texture = ExtResource("6_t")
+centered = false
+offset = Vector2(-25.500, -16.400)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimLib")
+}
+autoplay = "idle"

@@ -1,0 +1,321 @@
+class_name Combatiente
+extends Node2D
+## Comportamiento común de unidades y enemigos: avanzar por el carril,
+## buscar el objetivo más cercano (también en los carriles vecinos, y
+## cambiarse de carril para alcanzarlo), atacarlo y morir.
+
+signal murio(combatiente: Combatiente)
+
+const DURACION_DESTELLO := 0.12
+
+var id := ""
+var datos: Dictionary = {}
+var batalla: Batalla
+
+var vida_maxima := 1.0
+var vida := 1.0
+var dano := 0.0
+var intervalo_ataque := 1.0
+var alcance := 20.0
+var rango_deteccion := 150.0
+var velocidad := 0.0
+## Carril en el que está (0 arriba). Solo ataca a quien esté en su carril;
+## para atacar a alguien de otro carril primero se cambia a ese carril.
+var carril := 0
+## Carril al que se está moviendo (igual a carril si no cambia).
+var carril_destino := 0
+## +1 avanza hacia la derecha (unidades), -1 hacia la izquierda (enemigos).
+var direccion := 1.0
+var tamano := Vector2(26, 46)
+var color := Color(0.5, 0.5, 0.5)
+
+## Objetivo actual: un Combatiente o una Estructura.
+var objetivo = null
+var _espera_ataque := 0.0
+var _destello := 0.0
+var _destello_hasta := 0.0
+var _vivo := true
+var _desvio_y := 0.0
+
+## Dibujo animado por piezas (si los datos traen "visual"); sin él se
+## dibuja el rectángulo gris del prototipo.
+var visual: Node2D = null
+const BORDE_PAPEL := preload("res://arte/shaders/borde_papel.gdshader")
+const GROSOR_BORDE := 2.0
+const DESFASE_SOMBRA := Vector2(1.5, 2.5)
+var _borde_papel: ShaderMaterial = null
+var _animacion: AnimationPlayer = null
+var _escala_visual := 1.0
+var _alto_visual := 0.0
+var _zancada := 0.0
+var _posicion_anterior := Vector2.ZERO
+## Ataques animados (de "visual.ataques"): el daño llega cuando la
+## animación golpea, no al empezar. Cada "fuerte_cada" ataques usa el fuerte.
+var _ataques_visuales: Dictionary = {}
+var _fuerte_cada := 0
+var _ataques_hechos := 0
+var _golpe_en := -1.0
+var _golpe_blanco = null
+
+
+func configurar(id_: String, datos_: Dictionary, batalla_: Batalla, carril_: int = 0) -> void:
+	id = id_
+	carril = carril_
+	carril_destino = carril_
+	datos = datos_
+	batalla = batalla_
+	vida_maxima = float(datos.get("vida", 1))
+	vida = vida_maxima
+	dano = float(datos.get("dano", 0))
+	intervalo_ataque = float(datos.get("intervalo_ataque", 1.0))
+	alcance = float(datos.get("alcance", 20))
+	rango_deteccion = float(datos.get("rango_deteccion", 150))
+	velocidad = float(datos.get("velocidad", 0))
+	var t: Array = datos.get("tamano", [26, 46])
+	tamano = Vector2(t[0], t[1])
+	color = Color.from_hsv(0.0, 0.0, float(datos.get("tono", 0.5)))
+	if datos.has("visual"):
+		_crear_visual(datos.visual)
+
+
+func _crear_visual(info: Dictionary) -> void:
+	var escena := load(info.escena) as PackedScene
+	if escena == null:
+		push_error("No se pudo cargar %s" % info.escena)
+		return
+	visual = escena.instantiate()
+	_escala_visual = float(info.get("escala", 1.0))
+	_alto_visual = float(info.get("alto", 0.0)) * _escala_visual
+	_zancada = float(info.get("zancada", 0.0)) * _escala_visual
+	visual.scale = Vector2(_escala_visual * direccion, _escala_visual)
+	_ataques_visuales = info.get("ataques", {})
+	_fuerte_cada = int(info.get("fuerte_cada", 0))
+	# El dibujo va dentro de un CanvasGroup para recortarlo como figura de
+	# papel: borde blanco y sombra corta alrededor de toda la silueta.
+	var grupo := CanvasGroup.new()
+	grupo.fit_margin = 12.0
+	grupo.clear_margin = 12.0
+	var material := ShaderMaterial.new()
+	material.shader = BORDE_PAPEL
+	grupo.material = material
+	grupo.add_child(visual)
+	add_child(grupo)
+	_borde_papel = material
+	_ajustar_borde_papel()
+	_animacion = visual.get_node_or_null("AnimationPlayer")
+
+
+func _ready() -> void:
+	if _borde_papel != null:
+		_ajustar_borde_papel()
+		get_viewport().size_changed.connect(_ajustar_borde_papel)
+
+
+## El grosor del borde va en píxeles reales de pantalla: se multiplica por
+## cuánto se estira la imagen del juego para que se vea igual en cualquier
+## teléfono.
+func _ajustar_borde_papel() -> void:
+	if _borde_papel == null or not is_inside_tree():
+		return
+	var estiramiento := get_viewport().get_final_transform().get_scale().y
+	_borde_papel.set_shader_parameter("grosor", GROSOR_BORDE * estiramiento)
+	_borde_papel.set_shader_parameter("desfase_sombra", DESFASE_SOMBRA * estiramiento)
+
+
+func esta_vivo() -> bool:
+	return _vivo
+
+
+func radio() -> float:
+	return tamano.x / 2.0
+
+
+func distancia_desde(x: float) -> float:
+	return maxf(0.0, absf(x - position.x) - radio())
+
+
+func _physics_process(delta: float) -> void:
+	if not _vivo or batalla == null or batalla.terminada:
+		return
+	_espera_ataque = maxf(0.0, _espera_ataque - delta)
+	if _destello > 0.0:
+		_destello = maxf(0.0, _destello - delta)
+		if _destello == 0.0:
+			queue_redraw()
+	if _golpe_en >= 0.0:
+		_golpe_en -= delta
+		if _golpe_en < 0.0:
+			_golpear()
+	_posicion_anterior = position
+	actuar(delta)
+	if visual != null:
+		_animar()
+
+
+## Elige la animación según lo que hizo en este paso: correr si se movió,
+## quieto si no, y deja terminar el ataque si está en curso.
+func _animar() -> void:
+	var paso := position - _posicion_anterior
+	# Mira hacia donde camina o, si está quieto, hacia su objetivo.
+	var mirar := direccion
+	if absf(paso.x) > 0.001:
+		mirar = signf(paso.x)
+	elif objetivo != null and is_instance_valid(objetivo) and not is_equal_approx(objetivo.position.x, position.x):
+		mirar = signf(objetivo.position.x - position.x)
+	visual.scale.x = absf(visual.scale.x) * mirar
+	if _animacion == null:
+		return
+	if _animacion.current_animation.begins_with("attack") and _animacion.is_playing() \
+			and paso.length() <= 0.001:
+		return
+	if paso.length() > 0.001:
+		if _animacion.current_animation != "run":
+			_animacion.play("run", 0.12)
+		_animacion.speed_scale = velocidad / _zancada if _zancada > 0.0 else 1.0
+	elif _animacion.current_animation != "idle":
+		_animacion.play("idle", 0.2)
+		_animacion.speed_scale = 1.0
+
+
+## Un paso de comportamiento. Las subclases pueden reemplazarlo.
+func actuar(delta: float) -> void:
+	objetivo = elegir_objetivo()
+	if objetivo == null:
+		carril_destino = carril
+		cambiar_carril(delta)
+		mover(delta)
+		return
+	# El carril destino es siempre el del objetivo actual. Si el objetivo es
+	# la base o el obstáculo (cubren todos los carriles), sigue en el suyo.
+	if objetivo is Combatiente:
+		carril_destino = objetivo.carril
+	else:
+		carril_destino = carril
+	cambiar_carril(delta)
+	var distancia: float = objetivo.distancia_desde(position.x) - radio()
+	if distancia <= alcance:
+		if carril_destino == carril and _espera_ataque <= 0.0:
+			atacar(objetivo)
+	else:
+		mover(delta, objetivo.position.x)
+
+
+## Se desplaza en vertical hacia el suelo del carril destino (si ya está
+## allí no hace nada). Cambia de carril al llegar.
+func cambiar_carril(delta: float, velocidad_vertical: float = -1.0) -> void:
+	var y_destino: float = batalla.suelos[carril_destino] + _desvio_y
+	if is_equal_approx(position.y, y_destino):
+		carril = carril_destino
+		return
+	if velocidad_vertical < 0.0:
+		velocidad_vertical = batalla.velocidad_cambio_carril
+	var paso := velocidad_vertical * delta
+	if absf(y_destino - position.y) <= paso:
+		position.y = y_destino
+		carril = carril_destino
+	else:
+		position.y += signf(y_destino - position.y) * paso
+
+
+## Las subclases devuelven a quién atacar (o hacia quién caminar).
+func elegir_objetivo() -> Node2D:
+	return null
+
+
+## Avanza en su dirección o, si se indica, hacia la x de su objetivo
+## (por ejemplo, para perseguir a un enemigo que ya pasó).
+func mover(delta: float, hacia_x: float = NAN) -> void:
+	var sentido := direccion
+	if not is_nan(hacia_x) and not is_equal_approx(hacia_x, position.x):
+		sentido = signf(hacia_x - position.x)
+	position.x += sentido * velocidad * delta
+
+
+func atacar(blanco) -> void:
+	_espera_ataque = intervalo_ataque
+	_destello = DURACION_DESTELLO
+	_destello_hasta = blanco.position.x - position.x
+	if _animacion != null and not _ataques_visuales.is_empty():
+		_atacar_animado(blanco)
+	else:
+		blanco.recibir_dano(dano)
+		if _animacion != null and _animacion.has_animation("attack"):
+			# Si ataca más rápido de lo que dura el golpe, lo acelera.
+			_animacion.play("attack", 0.08)
+			_animacion.speed_scale = maxf(1.0, _animacion.current_animation_length / intervalo_ataque)
+	queue_redraw()
+
+
+## Ataque normal o, cada "fuerte_cada" ataques, el fuerte. El normal se
+## acelera si no cabe en el intervalo de ataque; el fuerte se ve completo y
+## alarga la espera hasta el siguiente ataque.
+func _atacar_animado(blanco) -> void:
+	_ataques_hechos += 1
+	var fuerte := _fuerte_cada > 0 and _ataques_hechos % _fuerte_cada == 0 \
+		and _ataques_visuales.has("fuerte")
+	var info: Dictionary = _ataques_visuales["fuerte" if fuerte else "normal"]
+	_animacion.play(info.animacion, 0.08)
+	var largo := _animacion.current_animation_length
+	_animacion.speed_scale = 1.0 if fuerte else maxf(1.0, largo / intervalo_ataque)
+	if fuerte:
+		_espera_ataque = maxf(intervalo_ataque, largo)
+	_golpe_blanco = blanco
+	_golpe_en = float(info.get("golpe", 0.0)) / _animacion.speed_scale
+
+
+func _golpear() -> void:
+	if _golpe_blanco != null and is_instance_valid(_golpe_blanco) and _golpe_blanco.esta_vivo():
+		_golpe_blanco.recibir_dano(dano)
+	_golpe_blanco = null
+
+
+func recibir_dano(cantidad: float) -> void:
+	if not _vivo:
+		return
+	vida -= cantidad
+	queue_redraw()
+	if vida <= 0.0:
+		morir()
+
+
+func morir() -> void:
+	_vivo = false
+	murio.emit(self)
+	queue_free()
+
+
+## El combatiente vivo más cercano de una lista dentro del rango de
+## detección. Cada carril de diferencia (contado desde el carril al que va)
+## cuenta como una distancia extra: prefiere a los de su carril, ve a los de
+## los vecinos y no cambia de idea a mitad de camino.
+func mas_cercano(candidatos: Array) -> Combatiente:
+	var mejor: Combatiente = null
+	var mejor_distancia := rango_deteccion
+	for c: Combatiente in candidatos:
+		if not c.esta_vivo():
+			continue
+		var d := c.distancia_desde(position.x) - radio() \
+			+ absi(c.carril - carril_destino) * batalla.coste_cambio_carril
+		if d <= mejor_distancia:
+			mejor = c
+			mejor_distancia = d
+	return mejor
+
+
+func _draw() -> void:
+	var alto := tamano.y
+	if visual != null:
+		alto = _alto_visual
+	else:
+		var rect := Rect2(-tamano.x / 2.0, -tamano.y, tamano.x, tamano.y)
+		draw_rect(rect, color)
+		draw_rect(rect, Color(0.1, 0.1, 0.1), false, 1.5)
+	# Barra de vida.
+	var ancho_barra := tamano.x + 6.0
+	var y := -alto - 8.0
+	draw_rect(Rect2(-ancho_barra / 2.0, y, ancho_barra, 4.0), Color(0.2, 0.2, 0.2))
+	draw_rect(Rect2(-ancho_barra / 2.0, y, ancho_barra * clampf(vida / vida_maxima, 0.0, 1.0), 4.0), Color(0.95, 0.95, 0.95))
+	# Línea de ataque.
+	if _destello > 0.0 and visual == null:
+		var altura := -tamano.y * 0.6
+		draw_line(Vector2(0, altura), Vector2(_destello_hasta, altura), Color(0.05, 0.05, 0.05), 2.0)
