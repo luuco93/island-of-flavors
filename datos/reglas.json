@@ -29,7 +29,7 @@
 		"explosivo"
 	],
 	"campo": {
-		"_nota": "Tres carriles horizontales. suelos_y es la altura del suelo de cada carril; la base y el obstáculo los cubren todos. Las unidades aparecen en el carril más amenazado y cambian de carril para perseguir objetivos: cada carril de diferencia cuenta como coste_cambio_carril píxeles más de distancia.",
+		"_nota": "Tres carriles horizontales. suelos_y es la altura del suelo de cada carril; la base y el obstáculo los cubren todos. Las unidades salen por la puerta de la base y van al carril más amenazado y cambian de carril para perseguir objetivos: cada carril de diferencia cuenta como coste_cambio_carril píxeles más de distancia.",
 		"suelos_y": [
 			290,
 			410,
@@ -39,6 +39,9 @@
 		"base_x": 80,
 		"obstaculo_x": 1200,
 		"aparicion_unidades_x": 150,
+		"_puerta": "La base tiene una sola puerta en el carril puerta_carril. Las unidades salen por ella y luego se abren en diagonal hasta su carril, a velocidad_salida_puerta píxeles por segundo en vertical.",
+		"puerta_carril": 1,
+		"velocidad_salida_puerta": 120,
 		"aparicion_enemigos_x": 1140,
 		"dispersion_y": 6,
 		"velocidad_cambio_carril": 60,

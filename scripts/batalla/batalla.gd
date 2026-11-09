@@ -47,6 +47,9 @@ var alto_carril := 120.0
 ## cada carril de diferencia al buscar objetivo.
 var velocidad_cambio_carril := 60.0
 var coste_cambio_carril := 120.0
+## Carril de la puerta de la base y velocidad vertical al salir por ella.
+var puerta_carril := 1
+var velocidad_salida_puerta := 120.0
 
 var _azar := RandomNumberGenerator.new()
 
@@ -60,10 +63,13 @@ func _ready() -> void:
 	alto_carril = float(campo.alto_carril)
 	velocidad_cambio_carril = float(campo.velocidad_cambio_carril)
 	coste_cambio_carril = float(campo.coste_cambio_carril)
+	puerta_carril = clampi(int(campo.get("puerta_carril", suelos.size() / 2)), 0, suelos.size() - 1)
+	velocidad_salida_puerta = float(campo.get("velocidad_salida_puerta", velocidad_cambio_carril))
 	var fondo := suelos[-1] + 10.0
 	var alto_total := fondo - (suelos[0] - alto_carril) + 20.0
 	base.position = Vector2(campo.base_x, fondo)
 	base.alto = alto_total
+	base.puerta_y = suelos[puerta_carril] - fondo
 	obstaculo.position = Vector2(campo.obstaculo_x, fondo)
 	obstaculo.alto = alto_total
 	punto_aparicion.position = Vector2(campo.aparicion_enemigos_x, 0)
@@ -181,8 +187,8 @@ func carril_en(y: float) -> int:
 	return -1
 
 
-## Invoca una unidad. Elige sola el carril más amenazado, salvo que se
-## indique uno.
+## Invoca una unidad. Sale por la puerta de la base y va sola al carril más
+## amenazado, salvo que se indique uno.
 func invocar(id: String, carril: int = -1) -> Unidad:
 	if not puede_invocar(id):
 		return null
@@ -193,7 +199,8 @@ func invocar(id: String, carril: int = -1) -> Unidad:
 	var unidad := Unidad.new()
 	unidad.configurar(id, Datos.unidad(id), self, carril)
 	unidad._desvio_y = _desvio_y()
-	unidad.position = Vector2(reglas.campo.aparicion_unidades_x, suelos[carril] + unidad._desvio_y)
+	unidad.salir_por_puerta(puerta_carril, carril)
+	unidad.position = Vector2(reglas.campo.aparicion_unidades_x, suelos[puerta_carril] + unidad._desvio_y)
 	capa_unidades.add_child(unidad)
 	unidades_invocadas += 1
 	unidad_invocada.emit(unidad)

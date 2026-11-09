@@ -202,12 +202,14 @@ func actuar(delta: float) -> void:
 
 ## Se desplaza en vertical hacia el suelo del carril destino (si ya está
 ## allí no hace nada). Cambia de carril al llegar.
-func cambiar_carril(delta: float) -> void:
+func cambiar_carril(delta: float, velocidad_vertical: float = -1.0) -> void:
 	var y_destino: float = batalla.suelos[carril_destino] + _desvio_y
 	if is_equal_approx(position.y, y_destino):
 		carril = carril_destino
 		return
-	var paso := batalla.velocidad_cambio_carril * delta
+	if velocidad_vertical < 0.0:
+		velocidad_vertical = batalla.velocidad_cambio_carril
+	var paso := velocidad_vertical * delta
 	if absf(y_destino - position.y) <= paso:
 		position.y = y_destino
 		carril = carril_destino
