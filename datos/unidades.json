@@ -8,7 +8,7 @@
 		"visual": {
 			"_nota": "Personaje animado por piezas. escala: tamaño en batalla. alto: alto del dibujo a escala 1 (para la barra de vida). zancada: px/s a escala 1 a los que los pies no patinan al correr.",
 			"escena": "res://arte/unidades/luchador_barato/luchador_barato.tscn",
-			"escala": 0.11, "alto": 600, "zancada": 564,
+			"escala": 0.16, "alto": 600, "zancada": 564,
 			"_ataques": "golpe: segundos desde que empieza la animación hasta que toca. El fuerte (luego será el crítico) sale cada fuerte_cada ataques.",
 			"ataques": {
 				"normal": {"animacion": "attack", "golpe": 0.24},

@@ -40,6 +40,10 @@ var _desvio_y := 0.0
 ## Dibujo animado por piezas (si los datos traen "visual"); sin él se
 ## dibuja el rectángulo gris del prototipo.
 var visual: Node2D = null
+const BORDE_PAPEL := preload("res://arte/shaders/borde_papel.gdshader")
+const GROSOR_BORDE := 2.0
+const DESFASE_SOMBRA := Vector2(1.5, 2.5)
+var _borde_papel: ShaderMaterial = null
 var _animacion: AnimationPlayer = null
 var _escala_visual := 1.0
 var _alto_visual := 0.0
@@ -86,8 +90,36 @@ func _crear_visual(info: Dictionary) -> void:
 	visual.scale = Vector2(_escala_visual * direccion, _escala_visual)
 	_ataques_visuales = info.get("ataques", {})
 	_fuerte_cada = int(info.get("fuerte_cada", 0))
-	add_child(visual)
+	# El dibujo va dentro de un CanvasGroup para recortarlo como figura de
+	# papel: borde blanco y sombra corta alrededor de toda la silueta.
+	var grupo := CanvasGroup.new()
+	grupo.fit_margin = 12.0
+	grupo.clear_margin = 12.0
+	var material := ShaderMaterial.new()
+	material.shader = BORDE_PAPEL
+	grupo.material = material
+	grupo.add_child(visual)
+	add_child(grupo)
+	_borde_papel = material
+	_ajustar_borde_papel()
 	_animacion = visual.get_node_or_null("AnimationPlayer")
+
+
+func _ready() -> void:
+	if _borde_papel != null:
+		_ajustar_borde_papel()
+		get_viewport().size_changed.connect(_ajustar_borde_papel)
+
+
+## El grosor del borde va en píxeles reales de pantalla: se multiplica por
+## cuánto se estira la imagen del juego para que se vea igual en cualquier
+## teléfono.
+func _ajustar_borde_papel() -> void:
+	if _borde_papel == null or not is_inside_tree():
+		return
+	var estiramiento := get_viewport().get_final_transform().get_scale().y
+	_borde_papel.set_shader_parameter("grosor", GROSOR_BORDE * estiramiento)
+	_borde_papel.set_shader_parameter("desfase_sombra", DESFASE_SOMBRA * estiramiento)
 
 
 func esta_vivo() -> bool:
